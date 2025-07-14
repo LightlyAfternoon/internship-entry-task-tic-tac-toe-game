@@ -130,6 +130,11 @@ namespace mobibank_test.controller
                 return Results.NotFound($"Игра с id={id} не найдена");
         }
 
+        /// <summary>
+        /// Получение списка всех ходов игры с указанным id
+        /// </summary>
+        /// <param name="id">id игры</param>
+        /// <returns>Все ходы, сделанные за игру</returns>
         [HttpGet("{id}/moves")]
         public IResult GetAllSessionMoves(long id)
         {
@@ -138,6 +143,24 @@ namespace mobibank_test.controller
             return Results.Json(fieldCells);
         }
 
+        /// <summary>
+        /// Добавление новой игры в БД
+        /// </summary>
+        /// <remarks>
+        /// Пример запроса:
+        ///
+        ///     PUT /1/moves
+        ///     {
+        ///        "x": 0,
+        ///        "y": 2,
+        ///        "session_id": 1,
+        ///        "ocupied_by_user_id": 1
+        ///     }
+        ///
+        /// </remarks>
+        /// <param name="id">id игры</param>
+        /// <param name="fieldCell">Данные клетки поля</param>
+        /// <returns></returns>
         [HttpPost("{id}/moves")]
         public IResult AddNewSessionMove(long id, [FromBody] FieldCell fieldCell)
         {
@@ -164,6 +187,13 @@ namespace mobibank_test.controller
                 return Results.BadRequest("Не получилось добавить ход");
         }
 
+        /// <summary>
+        /// Изменение данных хода с указанным id (если такой есть в БД)
+        /// </summary>
+        /// <param name="id">id игры</param>
+        /// <param name="moveId">id хода</param>
+        /// <param name="fieldCell">Данные клетки поля</param>
+        /// <returns></returns>
         [HttpPut("{id}/moves/{moveId}")]
         public IResult UpdateSessionMove(long id, long moveId, [FromBody] FieldCell fieldCell)
         {
@@ -182,6 +212,12 @@ namespace mobibank_test.controller
                 return Results.BadRequest("Не получилось изменить данные хода");
         }
 
+        /// <summary>
+        /// Удаление хода по id
+        /// </summary>
+        /// <param name="id">id игры</param>
+        /// <param name="moveId">id хода</param>
+        /// <returns></returns>
         [HttpDelete("{id}/moves/{moveId}")]
         public IResult DeleteMoveByMoveId(long id, long moveId)
         {
