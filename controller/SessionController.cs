@@ -144,13 +144,24 @@ namespace mobibank_test.controller
             if (fieldCell != null)
             {
                 fieldCell.SessionId = id;
+                Session session = SessionService.FindById(id);
+                if (session.Cells.Count > 0 && session.Cells.Count % 3 == 0)
+                {
+                    double chancePercentage = 10 / 100;
+                    double randomNumber = new Random().NextDouble();
+
+                    if (randomNumber <= chancePercentage)
+                    {
+                        fieldCell = ReverseFieldCellOwner(session, fieldCell);
+                    }
+                }
                 fieldCell = FieldCellService.Add(fieldCell);
             }
 
             if (fieldCell != null)
-                    return Results.Json(fieldCell);
-                else
-                    return Results.BadRequest("Не получилось добавить ход");
+                return Results.Json(fieldCell);
+            else
+                return Results.BadRequest("Не получилось добавить ход");
         }
 
         [HttpPut("{id}/moves/{moveId}")]
@@ -170,7 +181,7 @@ namespace mobibank_test.controller
             else
                 return Results.BadRequest("Не получилось изменить данные хода");
         }
-        
+
         [HttpDelete("{id}/moves/{moveId}")]
         public IResult DeleteMoveByMoveId(long id, long moveId)
         {
@@ -178,13 +189,23 @@ namespace mobibank_test.controller
                 return Results.NotFound($"Игра с id={id} не найдена");
             else if (FieldCellService.FindById(moveId) != null && FieldCellService.FindById(moveId).SessionId != id)
                 return Results.BadRequest($"Ход с id={moveId} не принадлежит данной игре");
-            
+
             bool isDeleted = FieldCellService.DeleteById(moveId);
 
             if (isDeleted)
                 return Results.Ok($"Ход с id={moveId} удалён");
             else
                 return Results.NotFound($"Ход с id={moveId} не найден");
+        }
+
+        private FieldCell ReverseFieldCellOwner(Session session, FieldCell cell)
+        {
+            if (session.GetCurrentTurnPlayer() == session.PlayerX)
+                cell.OccupiedByUserId = session.PlayerYId;
+            else
+                cell.OccupiedByUserId = session.PlayerXId;
+
+            return cell;
         }
     }
 }
