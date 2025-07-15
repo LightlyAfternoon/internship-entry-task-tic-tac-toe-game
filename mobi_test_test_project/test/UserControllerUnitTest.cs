@@ -66,11 +66,11 @@ namespace mobibank_test.mobi_test_test_project.test
 
             user = null;
             mockUserService.Setup(x => x.Add(user)).Returns(user);
-
-            Assert.Equal(((BadRequest<string>)Results.BadRequest("Не получилось добавить пользователя")).StatusCode,
-                         ((BadRequest<string>)controller.AddNewUser(user)).StatusCode);
-            Assert.Equal(((BadRequest<string>)Results.BadRequest("Не получилось добавить пользователя")).Value,
-                         ((BadRequest<string>)controller.AddNewUser(user)).Value);
+            
+            Assert.Equal(((BadRequest<StandardProblem>)Results.BadRequest(StandardProblem.UserBadRequest())).StatusCode,
+                         ((BadRequest<StandardProblem>)controller.AddNewUser(user)).StatusCode);
+            Assert.Equal(((BadRequest<StandardProblem>)Results.BadRequest(StandardProblem.UserBadRequest())).Value,
+                         ((BadRequest<StandardProblem>)controller.AddNewUser(user)).Value);
         }
 
         [Fact]
@@ -91,10 +91,10 @@ namespace mobibank_test.mobi_test_test_project.test
             mockUserService.Setup(x => x.FindById(1L)).Returns(user);
             mockUserService.Setup(x => x.Update(1L, user)).Returns(user);
 
-            Assert.Equal(((NotFound<string>)Results.NotFound($"Пользователь с id=1 не найден" )).StatusCode,
-                            ((NotFound<string>)controller.UpdateUser(1L, user)).StatusCode);
-            Assert.Equal(((NotFound<string>)Results.NotFound($"Пользователь с id=1 не найден" )).Value,
-                            ((NotFound<string>)controller.UpdateUser(1L, user)).Value);
+            Assert.Equal(((NotFound<StandardProblem>)Results.NotFound(StandardProblem.UserNotFound(1L))).StatusCode,
+                            ((NotFound<StandardProblem>)controller.UpdateUser(1L, user)).StatusCode);
+            Assert.Equal(((NotFound<StandardProblem>)Results.NotFound(StandardProblem.UserNotFound(1L))).Value,
+                            ((NotFound<StandardProblem>)controller.UpdateUser(1L, user)).Value);
         }
         
         [Fact]
@@ -112,10 +112,10 @@ namespace mobibank_test.mobi_test_test_project.test
 
             mockUserService.Setup(x => x.DeleteById(2L)).Returns(false);
 
-            Assert.Equal(((NotFound<string>)Results.NotFound($"Пользователь с id=2 не найден")).StatusCode,
-                         ((NotFound<string>)controller.DeleteUserById(2L)).StatusCode);
-            Assert.Equal(((NotFound<string>)Results.NotFound($"Пользователь с id=2 не найден")).Value,
-                         ((NotFound<string>)controller.DeleteUserById(2L)).Value);
+            Assert.Equal(((NotFound<StandardProblem>)Results.NotFound(StandardProblem.UserNotFound(2L))).StatusCode,
+                         ((NotFound<StandardProblem>)controller.DeleteUserById(2L)).StatusCode);
+            Assert.Equal(((NotFound<StandardProblem>)Results.NotFound(StandardProblem.UserNotFound(2L))).Value,
+                         ((NotFound<StandardProblem>)controller.DeleteUserById(2L)).Value);
         }
     }
 }

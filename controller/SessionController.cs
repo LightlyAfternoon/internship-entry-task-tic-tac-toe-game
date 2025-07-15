@@ -1,3 +1,4 @@
+using System.Net;
 using Microsoft.AspNetCore.Mvc;
 using mobibank_test.model;
 using mobibank_test.service;
@@ -32,7 +33,7 @@ namespace mobibank_test.controller
             if (session != null)
                 return Results.Json(session);
             else
-                return Results.NotFound($"Игра с id={id} не найдена");
+                return Results.NotFound(StandardProblem.SessionNotFound(id));
         }
 
         /// <summary>
@@ -74,7 +75,12 @@ namespace mobibank_test.controller
             if (session != null)
                 return Results.Json(session);
             else
-                return Results.BadRequest("Не получилось добавить игру");
+                return Results.BadRequest(new StandardProblem(
+                        type: "about:blank",
+                        status: HttpStatusCode.BadRequest,
+                        title: "Некорректные данные",
+                        detail: "Отсутствуют необходимые поля",
+                        instance: "/games"));
         }
 
         /// <summary>
@@ -102,14 +108,19 @@ namespace mobibank_test.controller
         public IResult UpdateSession(long id, [FromBody] Session session)
         {
             if (SessionService.FindById(id) == null)
-                return Results.NotFound($"Игра с id={id} не найдена");
+                return Results.NotFound(StandardProblem.SessionNotFound(id));
 
             session = SessionService.Update(id, session);
 
             if (session != null)
                 return Results.Json(session);
             else
-                return Results.BadRequest("Не получилось изменить данные игры");
+                return Results.BadRequest(new StandardProblem(
+                        type: "about:blank",
+                        status: HttpStatusCode.BadRequest,
+                        title: "Некорректные данные",
+                        detail: "Отсутствуют необходимые поля",
+                        instance: $"/games/{id}"));
         }
 
         /// <summary>
@@ -127,7 +138,7 @@ namespace mobibank_test.controller
             if (isDeleted)
                 return Results.Ok($"Игра с id={id} удалена");
             else
-                return Results.NotFound($"Игра с id={id} не найдена");
+                return Results.NotFound(StandardProblem.SessionNotFound(id));
         }
 
         /// <summary>
@@ -168,23 +179,28 @@ namespace mobibank_test.controller
             {
                 fieldCell.SessionId = id;
                 Session session = SessionService.FindById(id);
-                if (session.Cells.Count > 0 && session.Cells.Count % 3 == 0)
+                if (session == null)
                 {
-                    double chancePercentage = 10 / 100;
-                    double randomNumber = new Random().NextDouble();
-
-                    if (randomNumber <= chancePercentage)
-                    {
-                        fieldCell = ReverseFieldCellOwner(session, fieldCell);
-                    }
+                    return Results.NotFound(StandardProblem.SessionNotFound(id, 0L));
                 }
+                
+                if (session.Cells.Count > 0 && session.Cells.Count % 3 == 0)
+                    {
+                        double chancePercentage = 10 / 100;
+                        double randomNumber = new Random().NextDouble();
+
+                        if (randomNumber <= chancePercentage)
+                        {
+                            fieldCell = ReverseFieldCellOwner(session, fieldCell);
+                        }
+                    }
                 fieldCell = FieldCellService.Add(fieldCell);
             }
 
             if (fieldCell != null)
                 return Results.Json(fieldCell);
             else
-                return Results.BadRequest("Не получилось добавить ход");
+                return Results.BadRequest(StandardProblem.FieldBadRequest(id, 0L));
         }
 
         /// <summary>
@@ -198,18 +214,18 @@ namespace mobibank_test.controller
         public IResult UpdateSessionMove(long id, long moveId, [FromBody] FieldCell fieldCell)
         {
             if (SessionService.FindById(id) == null)
-                return Results.NotFound($"Игра с id={id} не найдена");
+                return Results.NotFound(StandardProblem.SessionNotFound(id, moveId));
             else if (FieldCellService.FindById(moveId) == null)
-                return Results.NotFound($"Ход с id={moveId} не найден");
+                return Results.NotFound(StandardProblem.FieldNotFound(id, moveId));
             else if (FieldCellService.FindById(moveId) != null && FieldCellService.FindById(moveId).SessionId != id)
-                return Results.BadRequest($"Ход с id={moveId} не принадлежит данной игре");
+                return Results.Problem(StandardProblem.FieldForbidden(id, moveId));
 
             fieldCell = FieldCellService.Update(id, fieldCell);
 
             if (fieldCell != null)
                 return Results.Json(fieldCell);
             else
-                return Results.BadRequest("Не получилось изменить данные хода");
+                return Results.BadRequest(StandardProblem.FieldBadRequest(id, moveId));
         }
 
         /// <summary>
@@ -222,16 +238,16 @@ namespace mobibank_test.controller
         public IResult DeleteMoveByMoveId(long id, long moveId)
         {
             if (SessionService.FindById(id) == null)
-                return Results.NotFound($"Игра с id={id} не найдена");
+                return Results.NotFound(StandardProblem.SessionNotFound(id, moveId));
             else if (FieldCellService.FindById(moveId) != null && FieldCellService.FindById(moveId).SessionId != id)
-                return Results.BadRequest($"Ход с id={moveId} не принадлежит данной игре");
+                return Results.Problem(StandardProblem.FieldForbidden(id, moveId));
 
             bool isDeleted = FieldCellService.DeleteById(moveId);
 
             if (isDeleted)
                 return Results.Ok($"Ход с id={moveId} удалён");
             else
-                return Results.NotFound($"Ход с id={moveId} не найден");
+                return Results.NotFound(StandardProblem.FieldNotFound(id, moveId));
         }
 
         private FieldCell ReverseFieldCellOwner(Session session, FieldCell cell)

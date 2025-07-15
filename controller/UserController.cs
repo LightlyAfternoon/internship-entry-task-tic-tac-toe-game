@@ -31,7 +31,7 @@ namespace mobibank_test.controller
             if (user != null)
                 return Results.Json(user);
             else
-                return Results.NotFound($"Пользователь с id={id} не найден");
+                return Results.NotFound(StandardProblem.UserNotFound(id));
         }
 
         /// <summary>
@@ -70,7 +70,7 @@ namespace mobibank_test.controller
             if (user != null)
                 return Results.Json(user);
             else
-                return Results.BadRequest("Не получилось добавить пользователя");
+                return Results.BadRequest(StandardProblem.UserBadRequest());
         }
 
         /// <summary>
@@ -96,14 +96,14 @@ namespace mobibank_test.controller
         public IResult UpdateUser(long id, [FromBody] User user)
         {
             if (UserService.FindById(id) == null)
-                return Results.NotFound($"Пользователь с id={id} не найден" );
+                return Results.NotFound(StandardProblem.UserNotFound(id));
 
             user = UserService.Update(id, user);
 
             if (user != null)
                 return Results.Json(user);
             else
-                return Results.BadRequest("Не получилось изменить данные пользователя");
+                return Results.BadRequest(StandardProblem.UserBadRequest(id));
         }
 
         /// <summary>
@@ -122,7 +122,7 @@ namespace mobibank_test.controller
             if (isDeleted)
                 return Results.Ok($"Пользователь с id={id} удалён");
             else
-                return Results.NotFound($"Пользователь с id={id} не найден");
+                return Results.NotFound(StandardProblem.UserNotFound(id));
         }
     }
 }

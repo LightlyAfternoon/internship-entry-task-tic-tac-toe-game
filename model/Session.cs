@@ -47,6 +47,7 @@ namespace mobibank_test.model
             FieldSize = 3;
             PlayerXId = playerXId;
             PlayerYId = playerYId;
+            Cells = new List<FieldCell>();
         }
 
         public Session(long playerXId, long playerYId)
@@ -54,6 +55,7 @@ namespace mobibank_test.model
             FieldSize = 3;
             PlayerXId = playerXId;
             PlayerYId = playerYId;
+            Cells = new List<FieldCell>();
         }
 
         public Session(long id, int fieldSize, long playerXId, long playerYId)
@@ -62,6 +64,7 @@ namespace mobibank_test.model
             FieldSize = fieldSize;
             PlayerXId = playerXId;
             PlayerYId = playerYId;
+            Cells = new List<FieldCell>();
         }
 
         public Session(int fieldSize, long playerXId, long playerYId)
@@ -69,6 +72,7 @@ namespace mobibank_test.model
             FieldSize = fieldSize;
             PlayerXId = playerXId;
             PlayerYId = playerYId;
+            Cells = new List<FieldCell>();
         }
 
         public Session(long id, Session session)
@@ -79,6 +83,7 @@ namespace mobibank_test.model
             PlayerYId = session.PlayerYId;
             WinnerId = session.WinnerId;
             IsEnded = session.IsEnded;
+            Cells = new List<FieldCell>();
         }
 
         public Session(Session session)
@@ -89,6 +94,7 @@ namespace mobibank_test.model
             PlayerYId = session.PlayerYId;
             WinnerId = session.WinnerId;
             IsEnded = session.IsEnded;
+            Cells = new List<FieldCell>();
         }
 
         public User GetCurrentTurnPlayer()

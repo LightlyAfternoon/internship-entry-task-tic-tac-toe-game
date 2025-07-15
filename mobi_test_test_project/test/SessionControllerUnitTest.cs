@@ -1,3 +1,4 @@
+using System.Net;
 using Microsoft.AspNetCore.Http.HttpResults;
 using mobibank_test.controller;
 using mobibank_test.model;
@@ -70,10 +71,10 @@ namespace mobibank_test.mobi_test_test_project.test
             session = null;
             mockSessionService.Setup(x => x.Add(session)).Returns(session);
 
-            Assert.Equal(((BadRequest<string>)Results.BadRequest("Не получилось добавить игру")).StatusCode,
-                         ((BadRequest<string>)controller.AddNewSession(session)).StatusCode);
-            Assert.Equal(((BadRequest<string>)Results.BadRequest("Не получилось добавить игру")).Value,
-                         ((BadRequest<string>)controller.AddNewSession(session)).Value);
+            Assert.Equal(((BadRequest<StandardProblem>)Results.BadRequest(StandardProblem.SessionBadRequest())).StatusCode,
+                         ((BadRequest<StandardProblem>)controller.AddNewSession(session)).StatusCode);
+            Assert.Equal(((BadRequest<StandardProblem>)Results.BadRequest(StandardProblem.SessionBadRequest())).Value,
+                         ((BadRequest<StandardProblem>)controller.AddNewSession(session)).Value);
         }
 
         [Fact]
@@ -94,11 +95,11 @@ namespace mobibank_test.mobi_test_test_project.test
             session = null;
             mockSessionService.Setup(x => x.FindById(1L)).Returns(session);
             mockSessionService.Setup(x => x.Update(1L, session)).Returns(session);
-
-            Assert.Equal(((NotFound<string>)Results.NotFound($"Игра с id=1 не найдена" )).StatusCode,
-                            ((NotFound<string>)controller.UpdateSession(1L, session)).StatusCode);
-            Assert.Equal(((NotFound<string>)Results.NotFound($"Игра с id=1 не найдена" )).Value,
-                            ((NotFound<string>)controller.UpdateSession(1L, session)).Value);
+            
+            Assert.Equal(((NotFound<StandardProblem>)Results.NotFound(StandardProblem.SessionNotFound(1L))).StatusCode,
+                            ((NotFound<StandardProblem>)controller.UpdateSession(1L, session)).StatusCode);
+            Assert.Equal(((NotFound<StandardProblem>)Results.NotFound(StandardProblem.SessionNotFound(1L))).Value,
+                            ((NotFound<StandardProblem>)controller.UpdateSession(1L, session)).Value);
         }
         
         [Fact]
@@ -117,10 +118,10 @@ namespace mobibank_test.mobi_test_test_project.test
 
             mockSessionService.Setup(x => x.DeleteById(2L)).Returns(false);
 
-            Assert.Equal(((NotFound<string>)Results.NotFound($"Игра с id=2 не найдена")).StatusCode,
-                         ((NotFound<string>)controller.DeleteSessionById(2L)).StatusCode);
-            Assert.Equal(((NotFound<string>)Results.NotFound($"Игра с id=2 не найдена")).Value,
-                         ((NotFound<string>)controller.DeleteSessionById(2L)).Value);
+            Assert.Equal(((NotFound<StandardProblem>)Results.NotFound(StandardProblem.SessionNotFound(2L))).StatusCode,
+                         ((NotFound<StandardProblem>)controller.DeleteSessionById(2L)).StatusCode);
+            Assert.Equal(((NotFound<StandardProblem>)Results.NotFound(StandardProblem.SessionNotFound(2L))).Value,
+                         ((NotFound<StandardProblem>)controller.DeleteSessionById(2L)).Value);
         }
 
         [Fact]
@@ -165,18 +166,19 @@ namespace mobibank_test.mobi_test_test_project.test
             var mockFieldCellService = new Mock<IFieldCellService>();
             var controller = new SessionController(mockSessionService.Object, mockFieldCellService.Object);
 
+            mockSessionService.Setup(x => x.FindById(session.Id)).Returns(session);
             mockFieldCellService.Setup(x => x.Add(move)).Returns(new FieldCell(1L, move));
 
             Assert.Equal(((JsonHttpResult<FieldCell>)Results.Json(new FieldCell(1L, move))).Value,
-                         ((JsonHttpResult<FieldCell>)controller.AddNewSessionMove(session.Id, move)).Value);
+                         ((JsonHttpResult<FieldCell>)controller.AddNewSessionMove(1L, move)).Value);
 
             move = null;
             mockFieldCellService.Setup(x => x.Add(move)).Returns(move);
-
-            Assert.Equal(((BadRequest<string>)Results.BadRequest("Не получилось добавить ход")).StatusCode,
-                         ((BadRequest<string>)controller.AddNewSessionMove(session.Id, move)).StatusCode);
-            Assert.Equal(((BadRequest<string>)Results.BadRequest("Не получилось добавить ход")).Value,
-                         ((BadRequest<string>)controller.AddNewSessionMove(session.Id, move)).Value);
+            
+            Assert.Equal(((BadRequest<StandardProblem>)Results.BadRequest(StandardProblem.FieldBadRequest(1L, 0L))).StatusCode,
+                         ((BadRequest<StandardProblem>)controller.AddNewSessionMove(1L, move)).StatusCode);
+            Assert.Equal(((BadRequest<StandardProblem>)Results.BadRequest(StandardProblem.FieldBadRequest(1L, 0L))).Value,
+                         ((BadRequest<StandardProblem>)controller.AddNewSessionMove(1L, move)).Value);
         }
 
         [Fact]
@@ -199,10 +201,10 @@ namespace mobibank_test.mobi_test_test_project.test
             move = null;
             mockFieldCellService.Setup(x => x.FindById(1L)).Returns(move);
 
-            Assert.Equal(((NotFound<string>)Results.NotFound($"Ход с id=1 не найден" )).StatusCode,
-                            ((NotFound<string>)controller.UpdateSessionMove(session.Id, 1L, move)).StatusCode);
-            Assert.Equal(((NotFound<string>)Results.NotFound($"Ход с id=1 не найден" )).Value,
-                            ((NotFound<string>)controller.UpdateSessionMove(session.Id, 1L, move)).Value);
+            Assert.Equal(((NotFound<StandardProblem>)Results.NotFound(StandardProblem.FieldNotFound(session.Id, 1L))).StatusCode,
+                            ((NotFound<StandardProblem>)controller.UpdateSessionMove(session.Id, 1L, move)).StatusCode);
+            Assert.Equal(((NotFound<StandardProblem>)Results.NotFound(StandardProblem.FieldNotFound(session.Id, 1L))).Value,
+                            ((NotFound<StandardProblem>)controller.UpdateSessionMove(session.Id, 1L, move)).Value);
         }
         
         [Fact]
@@ -222,10 +224,10 @@ namespace mobibank_test.mobi_test_test_project.test
 
             mockFieldCellService.Setup(x => x.DeleteById(2L)).Returns(false);
 
-            Assert.Equal(((NotFound<string>)Results.NotFound($"Ход с id=2 не найден")).StatusCode,
-                         ((NotFound<string>)controller.DeleteMoveByMoveId(2L, 2L)).StatusCode);
-            Assert.Equal(((NotFound<string>)Results.NotFound($"Ход с id=2 не найден")).Value,
-                         ((NotFound<string>)controller.DeleteMoveByMoveId(2L, 2L)).Value);
+            Assert.Equal(((NotFound<StandardProblem>)Results.NotFound(StandardProblem.FieldNotFound(2L, 2L))).StatusCode,
+                         ((NotFound<StandardProblem>)controller.DeleteMoveByMoveId(2L, 2L)).StatusCode);
+            Assert.Equal(((NotFound<StandardProblem>)Results.NotFound(StandardProblem.FieldNotFound(2L, 2L))).Value,
+                         ((NotFound<StandardProblem>)controller.DeleteMoveByMoveId(2L, 2L)).Value);
         }
     }
 }
