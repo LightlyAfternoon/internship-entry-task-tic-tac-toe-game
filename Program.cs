@@ -35,6 +35,8 @@ namespace mobibank_test
                 app.UseSwaggerUI();
             }
 
+            app.MapGet("/health", () => Results.Ok());
+
             app.UseHttpsRedirection();
 
             app.MapControllers();

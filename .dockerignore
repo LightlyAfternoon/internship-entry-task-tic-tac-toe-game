@@ -1,0 +1,9 @@
+**/bin
+**/obj
+**/mobi_test_test_project/bin
+**/mobi_test_test_project/obj
+
+**/.vscode
+.gitignore
+
+README.md

@@ -17,7 +17,7 @@ namespace mobibank_test.db
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
-            optionsBuilder.UseNpgsql("Host=localhost;Port=5432;Database=tic-tat-toe;Username=postgres;Password=pass");
+            optionsBuilder.UseNpgsql("Host=db;Port=5432;Database=tic-tat-toe-db;Username=postus;Password=passus");
         }
     }
 }
