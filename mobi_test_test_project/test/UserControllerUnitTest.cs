@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Http.HttpResults;
 using mobibank_test.controller;
+using mobibank_test.controller.dto;
 using mobibank_test.model;
 using mobibank_test.service;
 using Moq;
@@ -55,17 +56,17 @@ namespace mobibank_test.mobi_test_test_project.test
         [Fact]
         public void AddNewUserTest()
         {
-            var user = new User("test user");
+            var user = new UserInputDto(new User("test user"));
             var mockUserService = new Mock<IUserService>();
             var controller = new UserController(mockUserService.Object);
 
-            mockUserService.Setup(x => x.Add(user)).Returns(new User(1L, user));
+            mockUserService.Setup(x => x.Add(user.MapToEntity())).Returns(new User(1L, user.MapToEntity()));
 
-            Assert.Equal(((JsonHttpResult<User>)Results.Json(new User(1L, user))).Value,
+            Assert.Equal(((JsonHttpResult<User>)Results.Json(new User(1L, user.MapToEntity()))).Value,
                          ((JsonHttpResult<User>)controller.AddNewUser(user)).Value);
 
             user = null;
-            mockUserService.Setup(x => x.Add(user)).Returns(user);
+            mockUserService.Setup(x => x.Add(user.MapToEntity())).Returns(user.MapToEntity());
             
             Assert.Equal(((BadRequest<StandardProblem>)Results.BadRequest(StandardProblem.UserBadRequest())).StatusCode,
                          ((BadRequest<StandardProblem>)controller.AddNewUser(user)).StatusCode);
@@ -76,20 +77,20 @@ namespace mobibank_test.mobi_test_test_project.test
         [Fact]
         public void UpdateUserTest()
         {
-            var user = new User("test user");
+            var user = new UserInputDto(new User(1, "test user"));
             var mockUserService = new Mock<IUserService>();
             var controller = new UserController(mockUserService.Object);
 
-            mockUserService.Setup(x => x.FindById(2L)).Returns(new User(2L, user));
+            mockUserService.Setup(x => x.FindById(2L)).Returns(new User(2L, user.MapToEntity()));
             user.Name = "new name user";
-            mockUserService.Setup(x => x.Update(2L, user)).Returns(new User(2L, user));
+            mockUserService.Setup(x => x.Update(2L, user.MapToEntity())).Returns(new User(2L, user.MapToEntity()));
 
-            Assert.Equal(((JsonHttpResult<User>)Results.Json(new User(2, user))).Value,
+            Assert.Equal(((JsonHttpResult<User>)Results.Json(new User(2, user.MapToEntity()))).Value,
                          ((JsonHttpResult<User>)controller.UpdateUser(2, user)).Value);
 
             user = null;
-            mockUserService.Setup(x => x.FindById(1L)).Returns(user);
-            mockUserService.Setup(x => x.Update(1L, user)).Returns(user);
+            mockUserService.Setup(x => x.FindById(1L)).Returns(user.MapToEntity());
+            mockUserService.Setup(x => x.Update(1L, user.MapToEntity())).Returns(user.MapToEntity());
 
             Assert.Equal(((NotFound<StandardProblem>)Results.NotFound(StandardProblem.UserNotFound(1L))).StatusCode,
                             ((NotFound<StandardProblem>)controller.UpdateUser(1L, user)).StatusCode);

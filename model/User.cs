@@ -9,6 +9,7 @@ namespace mobibank_test.model
     {
         [Required]
         [Key]
+        [DatabaseGenerated(databaseGeneratedOption: DatabaseGeneratedOption.Identity)]
         [Column("id")]
         public long Id { get; private set; }
         [Required]

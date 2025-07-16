@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
+using mobibank_test.controller.dto;
 using mobibank_test.model;
 using mobibank_test.service;
 
@@ -63,9 +64,9 @@ namespace mobibank_test.controller
         /// <response code="400">Если user=null</response>
         [HttpPost]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        public IResult AddNewUser([FromBody] User user)
+        public IResult AddNewUser([FromBody] UserInputDto userDto)
         {
-            user = UserService.Add(user);
+            User user = UserService.Add(userDto.MapToEntity());
 
             if (user != null)
                 return Results.Json(user);
@@ -93,12 +94,12 @@ namespace mobibank_test.controller
         [HttpPut("{id}")]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public IResult UpdateUser(long id, [FromBody] User user)
+        public IResult UpdateUser(long id, [FromBody] UserInputDto userDto)
         {
             if (UserService.FindById(id) == null)
                 return Results.NotFound(StandardProblem.UserNotFound(id));
 
-            user = UserService.Update(id, user);
+            User user = UserService.Update(id, userDto.MapToEntity());
 
             if (user != null)
                 return Results.Json(user);

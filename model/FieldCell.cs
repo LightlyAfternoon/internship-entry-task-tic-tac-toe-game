@@ -9,6 +9,7 @@ namespace mobibank_test.model
     {
         [Required]
         [Key]
+        [DatabaseGenerated(databaseGeneratedOption: DatabaseGeneratedOption.Identity)]
         [Column("id")]
         public long Id { get; private set; }
         [Required]
@@ -27,6 +28,8 @@ namespace mobibank_test.model
         public virtual User OccupiedByUser { get; set; }
         [JsonIgnore]
         public virtual Session Session { get; set; }
+
+        public FieldCell() {}
 
         public FieldCell(long id, int x, int y, long sessionId)
         {

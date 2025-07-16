@@ -1,5 +1,6 @@
 using System.Net;
 using Microsoft.AspNetCore.Mvc;
+using mobibank_test.controller.dto;
 using mobibank_test.model;
 using mobibank_test.service;
 
@@ -68,9 +69,9 @@ namespace mobibank_test.controller
         /// <returns>Новую игру</returns>
         /// <response code="400">Если session=null</response>
         [HttpPost]
-        public IResult AddNewSession([FromBody] Session session)
+        public IResult AddNewSession([FromBody] SessionInputDto sessionInputDto)
         {
-            session = SessionService.Add(session);
+            Session session = SessionService.Add(sessionInputDto.MapToEntity());
 
             if (session != null)
                 return Results.Json(session);
@@ -105,12 +106,12 @@ namespace mobibank_test.controller
         /// <response code="400">Если session=null</response>
         /// <response code="404">Если игра с данным id не найдена</response>
         [HttpPut("{id}")]
-        public IResult UpdateSession(long id, [FromBody] Session session)
+        public IResult UpdateSession(long id, [FromBody] SessionInputDto sessionInputDto)
         {
             if (SessionService.FindById(id) == null)
                 return Results.NotFound(StandardProblem.SessionNotFound(id));
 
-            session = SessionService.Update(id, session);
+            Session session = session = SessionService.Update(id, sessionInputDto.MapToEntity());
 
             if (session != null)
                 return Results.Json(session);
@@ -173,27 +174,29 @@ namespace mobibank_test.controller
         /// <param name="fieldCell">Данные клетки поля</param>
         /// <returns></returns>
         [HttpPost("{id}/moves")]
-        public IResult AddNewSessionMove(long id, [FromBody] FieldCell fieldCell)
+        public IResult AddNewSessionMove(long id, [FromBody] FieldCellInputDto fieldCellInputDto)
         {
-            if (fieldCell != null)
+            FieldCell fieldCell = fieldCellInputDto.MapToEntity();
+
+            if (fieldCellInputDto != null)
             {
-                fieldCell.SessionId = id;
+                fieldCellInputDto.SessionId = id;
                 Session session = SessionService.FindById(id);
                 if (session == null)
                 {
                     return Results.NotFound(StandardProblem.SessionNotFound(id, 0L));
                 }
-                
-                if (session.Cells.Count > 0 && session.Cells.Count % 3 == 0)
-                    {
-                        double chancePercentage = 10 / 100;
-                        double randomNumber = new Random().NextDouble();
 
-                        if (randomNumber <= chancePercentage)
-                        {
-                            fieldCell = ReverseFieldCellOwner(session, fieldCell);
-                        }
+                if (session.Cells.Count > 0 && session.Cells.Count % 3 == 0)
+                {
+                    double chancePercentage = 10 / 100;
+                    double randomNumber = new Random().NextDouble();
+
+                    if (randomNumber <= chancePercentage)
+                    {
+                        fieldCell = ReverseFieldCellOwner(session, fieldCell);
                     }
+                }
                 fieldCell = FieldCellService.Add(fieldCell);
             }
 
@@ -211,7 +214,7 @@ namespace mobibank_test.controller
         /// <param name="fieldCell">Данные клетки поля</param>
         /// <returns></returns>
         [HttpPut("{id}/moves/{moveId}")]
-        public IResult UpdateSessionMove(long id, long moveId, [FromBody] FieldCell fieldCell)
+        public IResult UpdateSessionMove(long id, long moveId, [FromBody] FieldCellInputDto fieldCellInputDto)
         {
             if (SessionService.FindById(id) == null)
                 return Results.NotFound(StandardProblem.SessionNotFound(id, moveId));
@@ -220,7 +223,7 @@ namespace mobibank_test.controller
             else if (FieldCellService.FindById(moveId) != null && FieldCellService.FindById(moveId).SessionId != id)
                 return Results.Problem(StandardProblem.FieldForbidden(id, moveId));
 
-            fieldCell = FieldCellService.Update(id, fieldCell);
+            FieldCell fieldCell = FieldCellService.Update(id, fieldCellInputDto.MapToEntity());
 
             if (fieldCell != null)
                 return Results.Json(fieldCell);

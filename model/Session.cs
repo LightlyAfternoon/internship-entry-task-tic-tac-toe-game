@@ -9,6 +9,7 @@ namespace mobibank_test.model
     {
         [Required]
         [Key]
+        [DatabaseGenerated(databaseGeneratedOption: DatabaseGeneratedOption.Identity)]
         [Column("id")]
         public long Id { get; private set; }
         [Required]
@@ -22,7 +23,7 @@ namespace mobibank_test.model
         [Column("player_y_id"), ForeignKey("PlayerY")]
         public long PlayerYId { get; set; }
         [Column("winner_id"), ForeignKey("Winner")]
-        public long WinnerId { get; set; }
+        public long? WinnerId { get; set; }
         [Required]
         [Column("is_ended")]
         public bool IsEnded { get; set; }
@@ -39,7 +40,11 @@ namespace mobibank_test.model
         // текущего игрока можно определять исходя из кол-ва сделанных ходов
         public virtual ICollection<FieldCell> Cells { get; set; }
 
-        public Session() {}
+        public Session()
+        {
+            FieldSize = 3;
+            Cells = new List<FieldCell>();
+        }
 
         public Session(long id, long playerXId, long playerYId)
         {

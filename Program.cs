@@ -1,4 +1,5 @@
 using System.Reflection;
+using mobibank_test.db;
 using mobibank_test.repository;
 using mobibank_test.repository.impl;
 using mobibank_test.service;
@@ -22,6 +23,7 @@ namespace mobibank_test
                 options.IncludeXmlComments(Path.Combine(AppContext.BaseDirectory, xmlFilename));
             });
 
+            builder.Services.AddScoped<ApplicationContext>();
             builder.Services.AddScoped<IUserRepository, UserRepository>();
             builder.Services.AddScoped<IUserService, UserService>();
             builder.Services.AddControllers();
