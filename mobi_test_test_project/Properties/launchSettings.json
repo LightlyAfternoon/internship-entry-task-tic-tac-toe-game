@@ -1,0 +1,12 @@
+{
+  "profiles": {
+    "mobi_test_test_project": {
+      "commandName": "Project",
+      "launchBrowser": true,
+      "environmentVariables": {
+        "ASPNETCORE_ENVIRONMENT": "Development"
+      },
+      "applicationUrl": "https://localhost:53155;http://localhost:53156"
+    }
+  }
+}

@@ -1,4 +1,3 @@
-using System.Net;
 using Microsoft.AspNetCore.Http.HttpResults;
 using mobibank_test.controller;
 using mobibank_test.controller.dto;
