@@ -71,7 +71,7 @@ namespace mobibank_test.controller
         [HttpPost]
         public IResult AddNewSession([FromBody] SessionInputDto sessionInputDto)
         {
-            Session session = SessionService.Add(sessionInputDto.MapToEntity());
+            Session session = SessionService.Add(SessionInputDto.MapToEntity(sessionInputDto));
 
             if (session != null)
                 return Results.Json(session);
@@ -111,7 +111,7 @@ namespace mobibank_test.controller
             if (SessionService.FindById(id) == null)
                 return Results.NotFound(StandardProblem.SessionNotFound(id));
 
-            Session session = session = SessionService.Update(id, sessionInputDto.MapToEntity());
+            Session session = session = SessionService.Update(id, SessionInputDto.MapToEntity(sessionInputDto));
 
             if (session != null)
                 return Results.Json(session);
@@ -176,11 +176,11 @@ namespace mobibank_test.controller
         [HttpPost("{id}/moves")]
         public IResult AddNewSessionMove(long id, [FromBody] FieldCellInputDto fieldCellInputDto)
         {
-            FieldCell fieldCell = fieldCellInputDto.MapToEntity();
+            FieldCell fieldCell = FieldCellInputDto.MapToEntity(fieldCellInputDto);
 
-            if (fieldCellInputDto != null)
+            if (fieldCell != null)
             {
-                fieldCellInputDto.SessionId = id;
+                fieldCell.SessionId = id;
                 Session session = SessionService.FindById(id);
                 if (session == null)
                 {
@@ -207,7 +207,7 @@ namespace mobibank_test.controller
         }
 
         /// <summary>
-        /// Изменение данных хода с указанным id (если такой есть в БД)
+        /// Изменение данных хода с указанным moveId и принадлежащий игре с id (если такой есть в БД)
         /// </summary>
         /// <param name="id">id игры</param>
         /// <param name="moveId">id хода</param>
@@ -223,7 +223,7 @@ namespace mobibank_test.controller
             else if (FieldCellService.FindById(moveId) != null && FieldCellService.FindById(moveId).SessionId != id)
                 return Results.Problem(StandardProblem.FieldForbidden(id, moveId));
 
-            FieldCell fieldCell = FieldCellService.Update(id, fieldCellInputDto.MapToEntity());
+            FieldCell fieldCell = FieldCellService.Update(moveId, FieldCellInputDto.MapToEntity(fieldCellInputDto));
 
             if (fieldCell != null)
                 return Results.Json(fieldCell);
@@ -232,7 +232,7 @@ namespace mobibank_test.controller
         }
 
         /// <summary>
-        /// Удаление хода по id
+        /// Удаление хода по moveId
         /// </summary>
         /// <param name="id">id игры</param>
         /// <param name="moveId">id хода</param>

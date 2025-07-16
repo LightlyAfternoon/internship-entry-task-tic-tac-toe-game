@@ -11,15 +11,22 @@ namespace mobibank_test.controller.dto
 
         public FieldCellInputDto(FieldCell fieldCell)
         {
-            fieldCell.X = X;
-            fieldCell.Y = Y;
-            fieldCell.SessionId = SessionId;
-            fieldCell.OccupiedByUserId = OccupiedByUserId;
+            X = fieldCell.X;
+            Y = fieldCell.Y;
+            SessionId = fieldCell.SessionId;
+            OccupiedByUserId = fieldCell.OccupiedByUserId;
         }
 
-        public FieldCell MapToEntity()
+        public static FieldCell? MapToEntity(FieldCellInputDto fieldCellInputDto)
         {
-            return new FieldCell(X, Y, SessionId, OccupiedByUserId);
+            if (fieldCellInputDto != null)
+            {
+                return new FieldCell(fieldCellInputDto.X, fieldCellInputDto.Y, fieldCellInputDto.SessionId, fieldCellInputDto.OccupiedByUserId);
+            }
+            else
+            {
+                return null;
+            }
         }
     }
 }

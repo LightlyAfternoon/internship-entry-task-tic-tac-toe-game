@@ -66,7 +66,7 @@ namespace mobibank_test.controller
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         public IResult AddNewUser([FromBody] UserInputDto userDto)
         {
-            User user = UserService.Add(userDto.MapToEntity());
+            User user = UserService.Add(UserInputDto.MapToEntity(userDto));
 
             if (user != null)
                 return Results.Json(user);
@@ -99,7 +99,7 @@ namespace mobibank_test.controller
             if (UserService.FindById(id) == null)
                 return Results.NotFound(StandardProblem.UserNotFound(id));
 
-            User user = UserService.Update(id, userDto.MapToEntity());
+            User user = UserService.Update(id, UserInputDto.MapToEntity(userDto));
 
             if (user != null)
                 return Results.Json(user);

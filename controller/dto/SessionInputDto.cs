@@ -19,13 +19,18 @@ namespace mobibank_test.controller.dto
             IsEnded = session.IsEnded;
         }
 
-        public Session MapToEntity()
+        public static Session MapToEntity(SessionInputDto sessionInputDto)
         {
-            Session session = new Session(FieldSize, PlayerXId, PlayerYId);
-            session.WinnerId = WinnerId;
-            session.IsEnded = IsEnded;
-            
-            return session;
+            if (sessionInputDto != null)
+            {
+                Session session = new Session(sessionInputDto.FieldSize, sessionInputDto.PlayerXId, sessionInputDto.PlayerYId);
+                session.WinnerId = sessionInputDto.WinnerId;
+                session.IsEnded = sessionInputDto.IsEnded;
+
+                return session;
+            }
+            else
+                return null;
         }
     }
 }

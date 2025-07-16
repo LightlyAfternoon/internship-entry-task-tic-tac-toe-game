@@ -13,9 +13,12 @@ namespace mobibank_test.controller.dto
             Name = user.Name;
         }
 
-        public User MapToEntity()
+        public static User MapToEntity(UserInputDto userInputDto)
         {
-            return new User(Name);
+            if (userInputDto != null)
+                return new User(userInputDto.Name);
+            else
+                return null;
         }
     }
 }
