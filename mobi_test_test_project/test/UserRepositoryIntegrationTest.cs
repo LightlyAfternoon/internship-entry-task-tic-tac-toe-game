@@ -2,6 +2,7 @@ using mobibank_test.db;
 using mobibank_test.model;
 using mobibank_test.repository;
 using mobibank_test.repository.impl;
+using System.Threading.Tasks;
 using Testcontainers.PostgreSql;
 
 namespace mobibank_test.mobi_test_test_project.test
@@ -24,7 +25,7 @@ namespace mobibank_test.mobi_test_test_project.test
         }
 
         [Fact]
-        public void FindByIdTest()
+        public async Task FindByIdTest()
         {
             ApplicationContext = new ApplicationContext(Container.GetConnectionString());
 
@@ -33,20 +34,20 @@ namespace mobibank_test.mobi_test_test_project.test
             User user1 = new User();
             user1.Name = "user 1";
 
-            user1 = UserRepository.Save(user1);
+            user1 = await UserRepository.Save(user1);
 
-            Assert.Equal(user1, UserRepository.FindById(user1.Id));
+            Assert.Equal(user1, await UserRepository.FindById(user1.Id));
 
             User user2 = new User();
             user2.Name = "user 2";
 
-            user2 = UserRepository.Save(user2);
+            user2 = await UserRepository.Save(user2);
 
-            Assert.Equal(user2, UserRepository.FindById(user2.Id));
+            Assert.Equal(user2, await UserRepository.FindById(user2.Id));
         }
 
         [Fact]
-        public void FindAllTest()
+        public async Task FindAllTest()
         {
             ApplicationContext = new ApplicationContext(Container.GetConnectionString());
 
@@ -55,25 +56,25 @@ namespace mobibank_test.mobi_test_test_project.test
             User user1 = new User();
             user1.Name = "user 1";
 
-            user1 = UserRepository.Save(user1);
+            user1 = await UserRepository.Save(user1);
 
-            Assert.Contains(user1, UserRepository.FindAll());
+            Assert.Contains(user1, await UserRepository.FindAll());
 
             User user2 = new User();
             user2.Name = "user 2";
 
-            user2 = UserRepository.Save(user2);
+            user2 = await UserRepository.Save(user2);
 
-            Assert.Contains(user1, UserRepository.FindAll());
-            Assert.Contains(user2, UserRepository.FindAll());
+            Assert.Contains(user1, await UserRepository.FindAll());
+            Assert.Contains(user2, await UserRepository.FindAll());
 
-            UserRepository.DeleteById(user1.Id);
+            await UserRepository.DeleteById(user1.Id);
 
-            Assert.Contains(user2, UserRepository.FindAll());
+            Assert.Contains(user2, await UserRepository.FindAll());
         }
 
         [Fact]
-        public void SaveTest()
+        public async Task SaveTest()
         {
             ApplicationContext = new ApplicationContext(Container.GetConnectionString());
 
@@ -82,23 +83,23 @@ namespace mobibank_test.mobi_test_test_project.test
             User user1 = new User();
             user1.Name = "user 1";
 
-            user1 = UserRepository.Save(user1);
+            user1 = await UserRepository.Save(user1);
 
             Assert.Equal("user 1", user1.Name);
 
             User user2 = new User();
             user2.Name = "user 2";
 
-            Assert.Equal("user 2", UserRepository.Save(user2).Name);
+            Assert.Equal("user 2", (await UserRepository.Save(user2)).Name);
 
             User editedUser1 = new User(user1);
             editedUser1.Name = "user 3";
 
-            Assert.Equal("user 3", UserRepository.Save(editedUser1).Name);
+            Assert.Equal("user 3", (await UserRepository.Save(editedUser1)).Name);
         }
 
         [Fact]
-        public void DeleteByIdTest()
+        public async Task DeleteByIdTest()
         {
             ApplicationContext = new ApplicationContext(Container.GetConnectionString());
 
@@ -107,12 +108,12 @@ namespace mobibank_test.mobi_test_test_project.test
             User user1 = new User();
             user1.Name = "user 1";
 
-            user1 = UserRepository.Save(user1);
+            user1 = await UserRepository.Save(user1);
 
             Assert.Equal(1, user1.Id);
-            Assert.True(UserRepository.DeleteById(user1.Id));
+            Assert.True(await UserRepository.DeleteById(user1.Id));
 
-            Assert.False(UserRepository.DeleteById(50L));
+            Assert.False(await UserRepository.DeleteById(50L));
         }
     }
 }

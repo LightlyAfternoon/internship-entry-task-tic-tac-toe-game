@@ -12,33 +12,33 @@ namespace mobibank_test.service.impl
             UserRepository = userRepository;
         }
 
-        public User? FindById(long id)
+        public async Task<User?> FindById(long id)
         {
-            return UserRepository.FindById(id);
+            return await UserRepository.FindById(id);
         }
 
-        public List<User> FindAll()
+        public async Task<List<User>> FindAll()
         {
-            return UserRepository.FindAll();
+            return await UserRepository.FindAll();
         }
 
-        public User Add(User entity)
+        public async Task<User> Add(User entity)
         {
             User user = new User(0, entity);
 
-            return UserRepository.Save(user);
+            return await UserRepository.Save(user);
         }
 
-        public User Update(long id, User entity)
+        public async Task<User> Update(long id, User entity)
         {
             User user = new User(id, entity);
             
-            return UserRepository.Save(user);
+            return await UserRepository.Save(user);
         }
 
-        public bool DeleteById(long id)
+        public async Task<bool> DeleteById(long id)
         {
-            return UserRepository.DeleteById(id);
+            return await UserRepository.DeleteById(id);
         }
     }
 }

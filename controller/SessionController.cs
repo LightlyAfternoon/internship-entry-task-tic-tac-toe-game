@@ -27,9 +27,9 @@ namespace mobibank_test.controller
         /// <returns>Игру с указанным id</returns>
         /// <response code="404">Если игра с данным id не найдена</response>
         [HttpGet("{id}")]
-        public IResult GetSessionById(long id)
+        public async Task<IResult> GetSessionById(long id)
         {
-            Session? session = SessionService.FindById(id);
+            Session? session = await SessionService.FindById(id);
 
             if (session != null)
                 return Results.Json(session);
@@ -42,9 +42,9 @@ namespace mobibank_test.controller
         /// </summary>
         /// <returns>Все игры</returns>
         [HttpGet]
-        public IResult GetAllSessions()
+        public async Task<IResult> GetAllSessions()
         {
-            List<Session> sessions = SessionService.FindAll();
+            List<Session> sessions = await SessionService.FindAll();
 
             return Results.Json(sessions);
         }
@@ -57,7 +57,6 @@ namespace mobibank_test.controller
         ///
         ///     POST /games
         ///     {
-        ///        "field_size": "4",
         ///        "player_x_id": "2",
         ///        "player_y_id": "3",
         ///        "winner_id": 1,
@@ -69,9 +68,9 @@ namespace mobibank_test.controller
         /// <returns>Новую игру</returns>
         /// <response code="400">Если session=null</response>
         [HttpPost]
-        public IResult AddNewSession([FromBody] SessionInputDto sessionInputDto)
+        public async Task<IResult> AddNewSession([FromBody] SessionInputDto sessionInputDto)
         {
-            Session session = SessionService.Add(SessionInputDto.MapToEntity(sessionInputDto));
+            Session session = await SessionService.Add(SessionInputDto.MapToEntity(sessionInputDto));
 
             if (session != null)
                 return Results.Json(session);
@@ -92,7 +91,6 @@ namespace mobibank_test.controller
         ///
         ///     PUT /games
         ///     {
-        ///        "field_size": "4",
         ///        "player_x_id": "2",
         ///        "player_y_id": "3",
         ///        "winner_id": 1,
@@ -106,12 +104,12 @@ namespace mobibank_test.controller
         /// <response code="400">Если session=null</response>
         /// <response code="404">Если игра с данным id не найдена</response>
         [HttpPut("{id}")]
-        public IResult UpdateSession(long id, [FromBody] SessionInputDto sessionInputDto)
+        public async Task<IResult> UpdateSession(long id, [FromBody] SessionInputDto sessionInputDto)
         {
-            if (SessionService.FindById(id) == null)
+            if (await SessionService.FindById(id) == null)
                 return Results.NotFound(StandardProblem.SessionNotFound(id));
 
-            Session session = session = SessionService.Update(id, SessionInputDto.MapToEntity(sessionInputDto));
+            Session session = await SessionService.Update(id, SessionInputDto.MapToEntity(sessionInputDto));
 
             if (session != null)
                 return Results.Json(session);
@@ -132,9 +130,9 @@ namespace mobibank_test.controller
         /// <response code="200">Если игра с данным id успешно удалена</response>
         /// <response code="404">Если игра с данным id не найдена</response>
         [HttpDelete("{id}")]
-        public IResult DeleteSessionById(long id)
+        public async Task<IResult> DeleteSessionById(long id)
         {
-            bool isDeleted = SessionService.DeleteById(id);
+            bool isDeleted = await SessionService.DeleteById(id);
 
             if (isDeleted)
                 return Results.Ok($"Игра с id={id} удалена");
@@ -148,9 +146,9 @@ namespace mobibank_test.controller
         /// <param name="id">id игры</param>
         /// <returns>Все ходы, сделанные за игру</returns>
         [HttpGet("{id}/moves")]
-        public IResult GetAllSessionMoves(long id)
+        public async Task<IResult> GetAllSessionMoves(long id)
         {
-            List<FieldCell> fieldCells = FieldCellService.FindAllBySessionId(id);
+            List<FieldCell> fieldCells = await FieldCellService.FindAllBySessionId(id);
 
             return Results.Json(fieldCells);
         }
@@ -174,14 +172,14 @@ namespace mobibank_test.controller
         /// <param name="fieldCell">Данные клетки поля</param>
         /// <returns></returns>
         [HttpPost("{id}/moves")]
-        public IResult AddNewSessionMove(long id, [FromBody] FieldCellInputDto fieldCellInputDto)
+        public async Task<IResult> AddNewSessionMove(long id, [FromBody] FieldCellInputDto fieldCellInputDto)
         {
             FieldCell fieldCell = FieldCellInputDto.MapToEntity(fieldCellInputDto);
 
             if (fieldCell != null)
             {
                 fieldCell.SessionId = id;
-                Session session = SessionService.FindById(id);
+                Session session = await SessionService.FindById(id);
                 if (session == null)
                 {
                     return Results.NotFound(StandardProblem.SessionNotFound(id, 0L));
@@ -197,7 +195,7 @@ namespace mobibank_test.controller
                         fieldCell = ReverseFieldCellOwner(session, fieldCell);
                     }
                 }
-                fieldCell = FieldCellService.Add(fieldCell);
+                fieldCell = await FieldCellService.Add(fieldCell);
             }
 
             if (fieldCell != null)
@@ -214,16 +212,16 @@ namespace mobibank_test.controller
         /// <param name="fieldCell">Данные клетки поля</param>
         /// <returns></returns>
         [HttpPut("{id}/moves/{moveId}")]
-        public IResult UpdateSessionMove(long id, long moveId, [FromBody] FieldCellInputDto fieldCellInputDto)
+        public async Task<IResult> UpdateSessionMove(long id, long moveId, [FromBody] FieldCellInputDto fieldCellInputDto)
         {
-            if (SessionService.FindById(id) == null)
+            if (await SessionService.FindById(id) == null)
                 return Results.NotFound(StandardProblem.SessionNotFound(id, moveId));
-            else if (FieldCellService.FindById(moveId) == null)
+            else if (await FieldCellService.FindById(moveId) == null)
                 return Results.NotFound(StandardProblem.FieldNotFound(id, moveId));
-            else if (FieldCellService.FindById(moveId) != null && FieldCellService.FindById(moveId).SessionId != id)
+            else if (await FieldCellService.FindById(moveId) != null && (await FieldCellService.FindById(moveId)).SessionId != id)
                 return Results.Problem(StandardProblem.FieldForbidden(id, moveId));
 
-            FieldCell fieldCell = FieldCellService.Update(moveId, FieldCellInputDto.MapToEntity(fieldCellInputDto));
+            FieldCell fieldCell = await FieldCellService.Update(moveId, FieldCellInputDto.MapToEntity(fieldCellInputDto));
 
             if (fieldCell != null)
                 return Results.Json(fieldCell);
@@ -238,14 +236,14 @@ namespace mobibank_test.controller
         /// <param name="moveId">id хода</param>
         /// <returns></returns>
         [HttpDelete("{id}/moves/{moveId}")]
-        public IResult DeleteMoveByMoveId(long id, long moveId)
+        public async Task<IResult> DeleteMoveByMoveId(long id, long moveId)
         {
-            if (SessionService.FindById(id) == null)
+            if (await SessionService.FindById(id) == null)
                 return Results.NotFound(StandardProblem.SessionNotFound(id, moveId));
-            else if (FieldCellService.FindById(moveId) != null && FieldCellService.FindById(moveId).SessionId != id)
+            else if (await FieldCellService.FindById(moveId) != null && (await FieldCellService.FindById(moveId)).SessionId != id)
                 return Results.Problem(StandardProblem.FieldForbidden(id, moveId));
 
-            bool isDeleted = FieldCellService.DeleteById(moveId);
+            bool isDeleted = await FieldCellService.DeleteById(moveId);
 
             if (isDeleted)
                 return Results.Ok($"Ход с id={moveId} удалён");

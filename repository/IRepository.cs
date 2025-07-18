@@ -1,10 +1,12 @@
+using mobibank_test.model;
+
 namespace mobibank_test.repository
 {
     public interface IRepository<T>
     {
-        public T? FindById(long id);
-        public List<T> FindAll();
-        public T Save(T entity);
-        public bool DeleteById(long id);
+        public Task<T?> FindById(long id);
+        public Task<List<T>> FindAll();
+        public Task<T> Save(T entity);
+        public Task<bool> DeleteById(long id);
     }
 }

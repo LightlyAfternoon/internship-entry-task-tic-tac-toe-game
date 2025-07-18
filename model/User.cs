@@ -48,7 +48,7 @@ namespace mobibank_test.model
             Name = user.Name;
         }
 
-        public override bool Equals(object obj)
+        public override bool Equals(object? obj)
         {
             var user = obj as User;
 

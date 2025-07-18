@@ -26,7 +26,7 @@ namespace mobibank_test.mobi_test_test_project.test
         }
 
         [Fact]
-        public void FindByIdTest()
+        public async Task FindByIdTest()
         {
             ApplicationContext = new ApplicationContext(Container.GetConnectionString());
 
@@ -36,21 +36,21 @@ namespace mobibank_test.mobi_test_test_project.test
 
             FieldCell fieldCell1 = new FieldCell();
             Session session1 = new Session();
-            User user1 = UserRepository.Save(new User("user 1"));
-            User user2 = UserRepository.Save(new User("user 2"));
+            User user1 = await UserRepository.Save(new User("user 1"));
+            User user2 = await UserRepository.Save(new User("user 2"));
             session1.PlayerXId = user1.Id;
             session1.PlayerYId = user2.Id;
             session1.WinnerId = user2.Id;
             session1.IsEnded = true;
-            session1 = SessionRepository.Save(session1);
+            session1 = await SessionRepository.Save(session1);
             fieldCell1.X = 0;
             fieldCell1.Y = 0;
             fieldCell1.SessionId = session1.Id;
             fieldCell1.OccupiedByUserId = user1.Id;
 
-            fieldCell1 = FieldCellRepository.Save(fieldCell1);
+            fieldCell1 = await FieldCellRepository.Save(fieldCell1);
 
-            Assert.Equal(fieldCell1, FieldCellRepository.FindById(fieldCell1.Id));
+            Assert.Equal(fieldCell1, await FieldCellRepository.FindById(fieldCell1.Id));
 
             FieldCell fieldCell2 = new FieldCell();
             fieldCell2.X = 1;
@@ -58,13 +58,13 @@ namespace mobibank_test.mobi_test_test_project.test
             fieldCell2.SessionId = session1.Id;
             fieldCell2.OccupiedByUserId = user2.Id;
 
-            fieldCell2 = FieldCellRepository.Save(fieldCell2);
+            fieldCell2 = await FieldCellRepository.Save(fieldCell2);
 
-            Assert.Equal(fieldCell2, FieldCellRepository.FindById(fieldCell2.Id));
+            Assert.Equal(fieldCell2, await FieldCellRepository.FindById(fieldCell2.Id));
         }
 
         [Fact]
-        public void FindAllTest()
+        public async Task FindAllTest()
         {
             ApplicationContext = new ApplicationContext(Container.GetConnectionString());
 
@@ -74,21 +74,21 @@ namespace mobibank_test.mobi_test_test_project.test
 
             FieldCell fieldCell1 = new FieldCell();
             Session session1 = new Session();
-            User user1 = UserRepository.Save(new User("user 1"));
-            User user2 = UserRepository.Save(new User("user 2"));
+            User user1 = await UserRepository.Save(new User("user 1"));
+            User user2 = await UserRepository.Save(new User("user 2"));
             session1.PlayerXId = user1.Id;
             session1.PlayerYId = user2.Id;
             session1.WinnerId = user2.Id;
             session1.IsEnded = true;
-            session1 = SessionRepository.Save(session1);
+            session1 = await SessionRepository.Save(session1);
             fieldCell1.X = 0;
             fieldCell1.Y = 0;
             fieldCell1.SessionId = session1.Id;
             fieldCell1.OccupiedByUserId = user1.Id;
 
-            fieldCell1 = FieldCellRepository.Save(fieldCell1);
+            fieldCell1 = await FieldCellRepository.Save(fieldCell1);
 
-            Assert.Contains(fieldCell1, FieldCellRepository.FindAll());
+            Assert.Contains(fieldCell1, await FieldCellRepository.FindAll());
 
             FieldCell fieldCell2 = new FieldCell();
             fieldCell2.X = 1;
@@ -96,18 +96,18 @@ namespace mobibank_test.mobi_test_test_project.test
             fieldCell2.SessionId = session1.Id;
             fieldCell2.OccupiedByUserId = user2.Id;
 
-            fieldCell2 = FieldCellRepository.Save(fieldCell2);
+            fieldCell2 = await FieldCellRepository.Save(fieldCell2);
 
-            Assert.Contains(fieldCell1, FieldCellRepository.FindAll());
-            Assert.Contains(fieldCell2, FieldCellRepository.FindAll());
+            Assert.Contains(fieldCell1, await FieldCellRepository.FindAll());
+            Assert.Contains(fieldCell2, await FieldCellRepository.FindAll());
 
-            FieldCellRepository.DeleteById(fieldCell1.Id);
+            await FieldCellRepository.DeleteById(fieldCell1.Id);
 
-            Assert.Contains(fieldCell2, FieldCellRepository.FindAll());
+            Assert.Contains(fieldCell2, await FieldCellRepository.FindAll());
         }
 
         [Fact]
-        public void SaveTest()
+        public async Task SaveTest()
         {
             ApplicationContext = new ApplicationContext(Container.GetConnectionString());
 
@@ -117,19 +117,19 @@ namespace mobibank_test.mobi_test_test_project.test
 
             FieldCell fieldCell1 = new FieldCell();
             Session session1 = new Session();
-            User user1 = UserRepository.Save(new User("user 1"));
-            User user2 = UserRepository.Save(new User("user 2"));
+            User user1 = await UserRepository.Save(new User("user 1"));
+            User user2 = await UserRepository.Save(new User("user 2"));
             session1.PlayerXId = user1.Id;
             session1.PlayerYId = user2.Id;
             session1.WinnerId = user2.Id;
             session1.IsEnded = true;
-            session1 = SessionRepository.Save(session1);
+            session1 = await SessionRepository.Save(session1);
             fieldCell1.X = 0;
             fieldCell1.Y = 0;
             fieldCell1.SessionId = session1.Id;
             fieldCell1.OccupiedByUserId = user1.Id;
 
-            fieldCell1 = FieldCellRepository.Save(fieldCell1);
+            fieldCell1 = await FieldCellRepository.Save(fieldCell1);
 
             Assert.Equal(0, fieldCell1.X);
             Assert.Equal(0, fieldCell1.Y);
@@ -142,7 +142,7 @@ namespace mobibank_test.mobi_test_test_project.test
             fieldCell2.SessionId = session1.Id;
             fieldCell2.OccupiedByUserId = user2.Id;
 
-            fieldCell2 = FieldCellRepository.Save(fieldCell2);
+            fieldCell2 = await FieldCellRepository.Save(fieldCell2);
 
             Assert.Equal(1, fieldCell2.X);
             Assert.Equal(0, fieldCell2.Y);
@@ -152,7 +152,7 @@ namespace mobibank_test.mobi_test_test_project.test
             FieldCell editedFieldCell1 = new FieldCell(fieldCell1);
             editedFieldCell1.X = 2;
 
-            editedFieldCell1 = FieldCellRepository.Save(editedFieldCell1);
+            editedFieldCell1 = await FieldCellRepository.Save(editedFieldCell1);
 
             Assert.Equal(fieldCell1.Id, editedFieldCell1.Id);
             Assert.Equal(2, editedFieldCell1.X);
@@ -162,7 +162,7 @@ namespace mobibank_test.mobi_test_test_project.test
         }
 
         [Fact]
-        public void DeleteByIdTest()
+        public async Task DeleteByIdTest()
         {
             ApplicationContext = new ApplicationContext(Container.GetConnectionString());
 
@@ -172,23 +172,23 @@ namespace mobibank_test.mobi_test_test_project.test
 
             FieldCell fieldCell1 = new FieldCell();
             Session session1 = new Session();
-            User user1 = UserRepository.Save(new User("user 1"));
-            User user2 = UserRepository.Save(new User("user 2"));
+            User user1 = await UserRepository.Save(new User("user 1"));
+            User user2 = await UserRepository.Save(new User("user 2"));
             session1.PlayerXId = user1.Id;
             session1.PlayerYId = user2.Id;
             session1.WinnerId = user2.Id;
             session1.IsEnded = true;
-            session1 = SessionRepository.Save(session1);
+            session1 = await SessionRepository.Save(session1);
             fieldCell1.X = 0;
             fieldCell1.Y = 0;
             fieldCell1.SessionId = session1.Id;
             fieldCell1.OccupiedByUserId = user1.Id;
 
-            fieldCell1 = FieldCellRepository.Save(fieldCell1);
+            fieldCell1 = await FieldCellRepository.Save(fieldCell1);
 
-            Assert.True(FieldCellRepository.DeleteById(fieldCell1.Id));
+            Assert.True(await FieldCellRepository.DeleteById(fieldCell1.Id));
 
-            Assert.False(FieldCellRepository.DeleteById(50L));
+            Assert.False(await FieldCellRepository.DeleteById(50L));
         }
     }
 }

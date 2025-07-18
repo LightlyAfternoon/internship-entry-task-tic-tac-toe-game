@@ -13,43 +13,43 @@ namespace mobibank_test.repository.impl
             Db = applicationContext;
         }
 
-        public User? FindById(long id)
+        public async Task<User?> FindById(long id)
         {
             using (ApplicationContext db = new ApplicationContext(Db.ConnectionString))
             {
-                db.Sessions.Load();
-                db.Users.Load();
-                db.FieldCells.Load();
+                await db.Sessions.LoadAsync();
+                await db.Users.LoadAsync();
+                await db.FieldCells.LoadAsync();
 
-                return db.Users.Find(id);
+                return await db.Users.FindAsync(id);
             }
         }
 
-        public List<User> FindAll()
+        public async Task<List<User>> FindAll()
         {
             using (ApplicationContext db = new ApplicationContext(Db.ConnectionString))
             {
-                db.Sessions.Load();
-                db.Users.Load();
-                db.FieldCells.Load();
+                await db.Sessions.LoadAsync();
+                await db.Users.LoadAsync();
+                await db.FieldCells.LoadAsync();
 
-                return db.Users.ToList();
+                return await db.Users.ToListAsync();
             }
         }
 
-        public User Save(User entity)
+        public async Task<User> Save(User entity)
         {
             using (ApplicationContext db = new ApplicationContext(Db.ConnectionString))
             {
-                if (entity.Id <= 0 || FindById(entity.Id) == null)
+                if (entity.Id <= 0 || await FindById(entity.Id) == null)
                 {
-                    db.Users.Add(entity);
+                    await db.Users.AddAsync(entity);
 
-                    db.SaveChanges();
+                    await db.SaveChangesAsync();
 
-                    db.Sessions.Load();
-                    db.Users.Load();
-                    db.FieldCells.Load();
+                    await db.Sessions.LoadAsync();
+                    await db.Users.LoadAsync();
+                    await db.FieldCells.LoadAsync();
 
                     return entity;
                 }
@@ -57,36 +57,36 @@ namespace mobibank_test.repository.impl
                 {
                     db.Users.Update(entity);
 
-                    db.SaveChanges();
+                    await db.SaveChangesAsync();
 
-                    db.Sessions.Load();
-                    db.Users.Load();
-                    db.FieldCells.Load();
+                    await db.Sessions.LoadAsync();
+                    await db.Users.LoadAsync();
+                    await db.FieldCells.LoadAsync();
 
                     return entity;
                 }
             }
         }
 
-        public bool DeleteById(long id)
+        public async Task<bool> DeleteById(long id)
         {
             using (ApplicationContext db = new ApplicationContext(Db.ConnectionString))
             {
-                db.Users.Load();
+                await db.Users.LoadAsync();
 
-                User? user = db.Users.Find(id);
+                User? user = await db.Users.FindAsync(id);
 
                 if (user != null)
                 {
                     db.Users.Remove(user);
 
-                    db.SaveChanges();
+                    await db.SaveChangesAsync();
 
-                    db.Sessions.Load();
-                    db.Users.Load();
-                    db.FieldCells.Load();
+                    await db.Sessions.LoadAsync();
+                    await db.Users.LoadAsync();
+                    await db.FieldCells.LoadAsync();
 
-                    return db.Users.Find(id) == null;
+                    return await db.Users.FindAsync(id) == null;
                 }
                 else
                 {

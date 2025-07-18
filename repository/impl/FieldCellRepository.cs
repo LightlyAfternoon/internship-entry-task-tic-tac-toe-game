@@ -1,6 +1,5 @@
 using Microsoft.EntityFrameworkCore;
 using mobibank_test.db;
-using mobibank_test.mobi_test_test_project.test;
 using mobibank_test.model;
 
 namespace mobibank_test.repository.impl
@@ -14,79 +13,79 @@ namespace mobibank_test.repository.impl
             Db = applicationContext;
         }
 
-        public FieldCell? FindById(long id)
+        public async Task<FieldCell?> FindById(long id)
         {
             using (ApplicationContext db = new ApplicationContext(Db.ConnectionString))
             {
-                db.Sessions.Load();
-                db.Users.Load();
-                db.FieldCells.Load();
+                await db.Sessions.LoadAsync();
+                await db.Users.LoadAsync();
+                await db.FieldCells.LoadAsync();
 
-                return db.FieldCells.Find(id);
+                return await db.FieldCells.FindAsync(id);
             }
         }
 
-        public List<FieldCell> FindAll()
+        public async Task<List<FieldCell>> FindAll()
         {
             using (ApplicationContext db = new ApplicationContext(Db.ConnectionString))
             {
-                db.Sessions.Load();
-                db.Users.Load();
-                db.FieldCells.Load();
+                await db.Sessions.LoadAsync();
+                await db.Users.LoadAsync();
+                await db.FieldCells.LoadAsync();
 
-                return db.FieldCells.ToList();
+                return await db.FieldCells.ToListAsync();
             }
         }
 
-        public List<FieldCell> FindAllBySessionId(long sessionId)
+        public async Task<List<FieldCell>> FindAllBySessionId(long sessionId)
         {
             using (ApplicationContext db = new ApplicationContext(Db.ConnectionString))
             {
-                db.Sessions.Load();
-                db.Users.Load();
-                db.FieldCells.Load();
+                await db.Sessions.LoadAsync();
+                await db.Users.LoadAsync();
+                await db.FieldCells.LoadAsync();
 
-                return db.FieldCells.Where(c => c.SessionId == sessionId).ToList();
+                return await db.FieldCells.Where(c => c.SessionId == sessionId).ToListAsync();
             }
         }
 
-        public List<FieldCell> FindAllByOccupiedUserId(long userId)
+        public async Task<List<FieldCell>> FindAllByOccupiedUserId(long userId)
         {
             using (ApplicationContext db = new ApplicationContext(Db.ConnectionString))
             {
-                db.Sessions.Load();
-                db.Users.Load();
-                db.FieldCells.Load();
+                await db.Sessions.LoadAsync();
+                await db.Users.LoadAsync();
+                await db.FieldCells.LoadAsync();
 
-                return db.FieldCells.Where(c => c.OccupiedByUserId == userId).ToList();
+                return await db.FieldCells.Where(c => c.OccupiedByUserId == userId).ToListAsync();
             }
         }
 
-        public List<FieldCell> FindAllBySessionIdAndOccupiedUserId(long sessionId, long userId)
+        public async Task<List<FieldCell>> FindAllBySessionIdAndOccupiedUserId(long sessionId, long userId)
         {
             using (ApplicationContext db = new ApplicationContext(Db.ConnectionString))
             {
-                db.Sessions.Load();
-                db.Users.Load();
-                db.FieldCells.Load();
+                await db.Sessions.LoadAsync();
+                await db.Users.LoadAsync();
+                await db.FieldCells.LoadAsync();
 
-                return db.FieldCells.Where(c => c.SessionId == sessionId && c.OccupiedByUserId == userId).ToList();
+                return await db.FieldCells.Where(c => c.SessionId == sessionId && c.OccupiedByUserId == userId).ToListAsync();
             }
         }
 
-        public FieldCell Save(FieldCell entity)
+        public async Task<FieldCell> Save(FieldCell entity)
         {
             using (ApplicationContext db = new ApplicationContext(Db.ConnectionString))
             {
-                if (entity.Id <= 0 || FindById(entity.Id) == null)
+                if (entity.Id <= 0 || await FindById(entity.Id) == null)
                 {
-                    db.FieldCells.Add(entity);
+                    await db.FieldCells.AddAsync(entity);
 
-                    db.SaveChanges();
+                    await db.SaveChangesAsync();
 
-                    db.Sessions.Load();
-                    db.Users.Load();
-                    db.FieldCells.Load();
+                    await db.Sessions.LoadAsync();
+                    await db.Users.LoadAsync();
+                    await db.FieldCells.LoadAsync();
 
                     return entity;
                 }
@@ -94,36 +93,36 @@ namespace mobibank_test.repository.impl
                 {
                     db.FieldCells.Update(entity);
 
-                    db.SaveChanges();
+                    await db.SaveChangesAsync();
 
-                    db.Sessions.Load();
-                    db.Users.Load();
-                    db.FieldCells.Load();
+                    await db.Sessions.LoadAsync();
+                    await db.Users.LoadAsync();
+                    await db.FieldCells.LoadAsync();
 
                     return entity;
                 }
             }
         }
 
-        public bool DeleteById(long id)
+        public async Task<bool> DeleteById(long id)
         {
             using (ApplicationContext db = new ApplicationContext(Db.ConnectionString))
             {
-                db.FieldCells.Load();
+                await db.FieldCells.LoadAsync();
 
-                FieldCell? fieldCell = db.FieldCells.Find(id);
+                FieldCell? fieldCell = await db.FieldCells.FindAsync(id);
 
                 if (fieldCell != null)
                 {
                     db.FieldCells.Remove(fieldCell);
 
-                    db.SaveChanges();
+                    await db.SaveChangesAsync();
 
-                    db.Sessions.Load();
-                    db.Users.Load();
-                    db.FieldCells.Load();
+                    await db.Sessions.LoadAsync();
+                    await db.Users.LoadAsync();
+                    await db.FieldCells.LoadAsync();
 
-                    return db.FieldCells.Find(id) == null;
+                    return await db.FieldCells.FindAsync(id) == null;
                 }
                 else
                     return false;

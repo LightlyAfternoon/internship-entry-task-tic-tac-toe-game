@@ -12,48 +12,48 @@ namespace mobibank_test.service.impl
             FieldCellRepository = fieldCellRepository;
         }
 
-        public FieldCell? FindById(long id)
+        public async Task<FieldCell?> FindById(long id)
         {
-            return FieldCellRepository.FindById(id);
+            return await FieldCellRepository.FindById(id);
         }
 
-        public List<FieldCell> FindAll()
+        public async Task<List<FieldCell>> FindAll()
         {
-            return FieldCellRepository.FindAll();
+            return await FieldCellRepository.FindAll();
         }
 
-        public List<FieldCell> FindAllBySessionId(long sessionId)
+        public async Task<List<FieldCell>> FindAllBySessionId(long sessionId)
         {
-            return FieldCellRepository.FindAllBySessionId(sessionId);
+            return await FieldCellRepository.FindAllBySessionId(sessionId);
         }
 
-        public List<FieldCell> FindAllByOccupiedUserId(long userId)
+        public async Task<List<FieldCell>> FindAllByOccupiedUserId(long userId)
         {
-            return FieldCellRepository.FindAllByOccupiedUserId(userId);
+            return await FieldCellRepository.FindAllByOccupiedUserId(userId);
         }
 
-        public List<FieldCell> FindAllBySessionIdAndOccupiedUserId(long sessionId, long userId)
+        public async Task<List<FieldCell>> FindAllBySessionIdAndOccupiedUserId(long sessionId, long userId)
         {
-            return FieldCellRepository.FindAllBySessionIdAndOccupiedUserId(sessionId, userId);
+            return await FieldCellRepository.FindAllBySessionIdAndOccupiedUserId(sessionId, userId);
         }
 
-        public FieldCell Add(FieldCell entity)
+        public async Task<FieldCell> Add(FieldCell entity)
         {
             FieldCell fieldcell = new FieldCell(0, entity);
 
-            return FieldCellRepository.Save(fieldcell);
+            return await FieldCellRepository.Save(fieldcell);
         }
 
-        public FieldCell Update(long id, FieldCell entity)
+        public async Task<FieldCell> Update(long id, FieldCell entity)
         {
             FieldCell fieldcell = new FieldCell(id, entity);
 
-            return FieldCellRepository.Save(fieldcell);
+            return await FieldCellRepository.Save(fieldcell);
         }
 
-        public bool DeleteById(long id)
+        public async Task<bool> DeleteById(long id)
         {
-            return FieldCellRepository.DeleteById(id);
+            return await FieldCellRepository.DeleteById(id);
         }
     }
 }

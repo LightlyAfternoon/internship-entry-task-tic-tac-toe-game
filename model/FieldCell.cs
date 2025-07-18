@@ -81,7 +81,7 @@ namespace mobibank_test.model
             OccupiedByUserId = cell.OccupiedByUserId;
         }
 
-        public override bool Equals(object obj)
+        public override bool Equals(object? obj)
         {
             var fieldCell = obj as FieldCell;
 

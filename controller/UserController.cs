@@ -25,9 +25,9 @@ namespace mobibank_test.controller
         /// <response code="404">Если игрок с данным id не найден</response>
         [HttpGet("{id}")]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public IResult GetUserById(long id)
+        public async Task<IResult> GetUserById(long id)
         {
-            User? user = UserService.FindById(id);
+            User? user = await UserService.FindById(id);
 
             if (user != null)
                 return Results.Json(user);
@@ -40,9 +40,9 @@ namespace mobibank_test.controller
         /// </summary>
         /// <returns>Всех игроков</returns>
         [HttpGet]
-        public IResult GetAllUsers()
+        public async Task<IResult> GetAllUsers()
         {
-            List<User> users = UserService.FindAll();
+            List<User> users = await UserService.FindAll();
 
             return Results.Json(users);
         }
@@ -64,9 +64,9 @@ namespace mobibank_test.controller
         /// <response code="400">Если user=null</response>
         [HttpPost]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        public IResult AddNewUser([FromBody] UserInputDto userDto)
+        public async Task<IResult> AddNewUser([FromBody] UserInputDto userDto)
         {
-            User user = UserService.Add(UserInputDto.MapToEntity(userDto));
+            User user = await UserService.Add(UserInputDto.MapToEntity(userDto));
 
             if (user != null)
                 return Results.Json(user);
@@ -94,12 +94,12 @@ namespace mobibank_test.controller
         [HttpPut("{id}")]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public IResult UpdateUser(long id, [FromBody] UserInputDto userDto)
+        public async Task<IResult> UpdateUser(long id, [FromBody] UserInputDto userDto)
         {
-            if (UserService.FindById(id) == null)
+            if (await UserService.FindById(id) == null)
                 return Results.NotFound(StandardProblem.UserNotFound(id));
 
-            User user = UserService.Update(id, UserInputDto.MapToEntity(userDto));
+            User user = await UserService.Update(id, UserInputDto.MapToEntity(userDto));
 
             if (user != null)
                 return Results.Json(user);
@@ -116,9 +116,9 @@ namespace mobibank_test.controller
         /// <response code="404">Если игрок с данным id не найден</response>
         [HttpDelete("{id}")]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public IResult DeleteUserById(long id)
+        public async Task<IResult> DeleteUserById(long id)
         {
-            bool isDeleted = UserService.DeleteById(id);
+            bool isDeleted = await UserService.DeleteById(id);
 
             if (isDeleted)
                 return Results.Ok($"Пользователь с id={id} удалён");

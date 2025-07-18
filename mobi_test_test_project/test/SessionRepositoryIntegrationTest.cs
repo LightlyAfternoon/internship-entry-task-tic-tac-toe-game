@@ -8,7 +8,8 @@ namespace mobibank_test.mobi_test_test_project.test
 {
     public class SessionRepositoryIntegrationTest : IAsyncLifetime
     {
-        private readonly PostgreSqlContainer Container = new PostgreSqlBuilder().WithImage("postgres:17.4").WithCleanUp(true).Build();
+        private readonly PostgreSqlContainer Container = new PostgreSqlBuilder()
+            .WithImage("postgres:17.4").WithCleanUp(true).WithEnvironment("FIELD_SIZE", "3").Build();
 
         private ISessionRepository SessionRepository;
         private IUserRepository UserRepository;
@@ -25,7 +26,7 @@ namespace mobibank_test.mobi_test_test_project.test
         }
 
         [Fact]
-        public void FindByIdTest()
+        public async Task FindByIdTest()
         {
             ApplicationContext = new ApplicationContext(Container.GetConnectionString());
 
@@ -33,28 +34,28 @@ namespace mobibank_test.mobi_test_test_project.test
             UserRepository = new UserRepository(ApplicationContext);
 
             Session session1 = new Session();
-            User user1 = UserRepository.Save(new User("user 1"));
-            User user2 = UserRepository.Save(new User("user 2"));
+            User user1 = await UserRepository.Save(new User("user 1"));
+            User user2 = await UserRepository.Save(new User("user 2"));
             session1.PlayerXId = user1.Id;
             session1.PlayerYId = user2.Id;
             session1.WinnerId = user2.Id;
             session1.IsEnded = true;
 
-            session1 = SessionRepository.Save(session1);
+            session1 = await SessionRepository.Save(session1);
 
-            Assert.Equal(session1, SessionRepository.FindById(session1.Id));
+            Assert.Equal(session1, await SessionRepository.FindById(session1.Id));
 
             Session session2 = new Session();
             session2.PlayerXId = user2.Id;
             session2.PlayerYId = user1.Id;
 
-            session2 = SessionRepository.Save(session2);
+            session2 = await SessionRepository.Save(session2);
 
-            Assert.Equal(session2, SessionRepository.FindById(session2.Id));
+            Assert.Equal(session2, await SessionRepository.FindById(session2.Id));
         }
 
         [Fact]
-        public void FindAllTest()
+        public async Task FindAllTest()
         {
             ApplicationContext = new ApplicationContext(Container.GetConnectionString());
 
@@ -62,33 +63,33 @@ namespace mobibank_test.mobi_test_test_project.test
             UserRepository = new UserRepository(ApplicationContext);
 
             Session session1 = new Session();
-            User user1 = UserRepository.Save(new User("user 1"));
-            User user2 = UserRepository.Save(new User("user 2"));
+            User user1 = await UserRepository.Save(new User("user 1"));
+            User user2 = await UserRepository.Save(new User("user 2"));
             session1.PlayerXId = user1.Id;
             session1.PlayerYId = user2.Id;
             session1.WinnerId = user2.Id;
             session1.IsEnded = true;
 
-            session1 = SessionRepository.Save(session1);
+            session1 = await SessionRepository.Save(session1);
 
-            Assert.Contains(session1, SessionRepository.FindAll());
+            Assert.Contains(session1, await SessionRepository.FindAll());
 
             Session session2 = new Session();
             session2.PlayerXId = user2.Id;
             session2.PlayerYId = user1.Id;
 
-            session2 = SessionRepository.Save(session2);
+            session2 = await SessionRepository.Save(session2);
             
-            Assert.Contains(session1, SessionRepository.FindAll());
-            Assert.Contains(session2, SessionRepository.FindAll());
+            Assert.Contains(session1, await SessionRepository.FindAll());
+            Assert.Contains(session2, await SessionRepository.FindAll());
 
-            SessionRepository.DeleteById(session1.Id);
+            await SessionRepository.DeleteById(session1.Id);
 
-            Assert.Contains(session2, SessionRepository.FindAll());
+            Assert.Contains(session2, await SessionRepository.FindAll());
         }
 
         [Fact]
-        public void SaveTest()
+        public async Task SaveTest()
         {
             ApplicationContext = new ApplicationContext(Container.GetConnectionString());
 
@@ -96,14 +97,14 @@ namespace mobibank_test.mobi_test_test_project.test
             UserRepository = new UserRepository(ApplicationContext);
 
             Session session1 = new Session();
-            User user1 = UserRepository.Save(new User("user 1"));
-            User user2 = UserRepository.Save(new User("user 2"));
+            User user1 = await UserRepository.Save(new User("user 1"));
+            User user2 = await UserRepository.Save(new User("user 2"));
             session1.PlayerXId = user1.Id;
             session1.PlayerYId = user2.Id;
             session1.WinnerId = user2.Id;
             session1.IsEnded = true;
 
-            session1 = SessionRepository.Save(session1);
+            session1 = await SessionRepository.Save(session1);
 
             Assert.Equal(user1.Id, session1.PlayerXId);
             Assert.Equal(user2.Id, session1.PlayerYId);
@@ -114,7 +115,7 @@ namespace mobibank_test.mobi_test_test_project.test
             session2.PlayerXId = user2.Id;
             session2.PlayerYId = user1.Id;
 
-            session2 = SessionRepository.Save(session2);
+            session2 = await SessionRepository.Save(session2);
 
             Assert.Equal(user2.Id, session2.PlayerXId);
             Assert.Equal(user1.Id, session2.PlayerYId);
@@ -124,7 +125,7 @@ namespace mobibank_test.mobi_test_test_project.test
             Session editedSession1 = new Session(session1);
             editedSession1.WinnerId = user1.Id;
 
-            editedSession1 = SessionRepository.Save(editedSession1);
+            editedSession1 = await SessionRepository.Save(editedSession1);
 
             Assert.Equal(session1.Id, editedSession1.Id);
             Assert.Equal(user1.Id, editedSession1.PlayerXId);
@@ -134,7 +135,7 @@ namespace mobibank_test.mobi_test_test_project.test
         }
 
         [Fact]
-        public void DeleteByIdTest()
+        public async Task DeleteByIdTest()
         {
             ApplicationContext = new ApplicationContext(Container.GetConnectionString());
 
@@ -142,18 +143,18 @@ namespace mobibank_test.mobi_test_test_project.test
             UserRepository = new UserRepository(ApplicationContext);
 
             Session session1 = new Session();
-            User user1 = UserRepository.Save(new User("user 1"));
-            User user2 = UserRepository.Save(new User("user 2"));
+            User user1 = await UserRepository.Save(new User("user 1"));
+            User user2 = await UserRepository.Save(new User("user 2"));
             session1.PlayerXId = user1.Id;
             session1.PlayerYId = user2.Id;
             session1.WinnerId = user2.Id;
             session1.IsEnded = true;
 
-            session1 = SessionRepository.Save(session1);
+            session1 = await SessionRepository.Save(session1);
 
-            Assert.True(SessionRepository.DeleteById(session1.Id));
+            Assert.True(await SessionRepository.DeleteById(session1.Id));
 
-            Assert.False(SessionRepository.DeleteById(50L));
+            Assert.False(await SessionRepository.DeleteById(50L));
         }
     }
 }

@@ -110,7 +110,7 @@ namespace mobibank_test.model
                 return PlayerY;
         }
 
-        public override bool Equals(object obj)
+        public override bool Equals(object? obj)
         {
             var session = obj as Session;
 

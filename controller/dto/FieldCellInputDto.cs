@@ -17,7 +17,7 @@ namespace mobibank_test.controller.dto
             OccupiedByUserId = fieldCell.OccupiedByUserId;
         }
 
-        public static FieldCell? MapToEntity(FieldCellInputDto fieldCellInputDto)
+        public static FieldCell? MapToEntity(FieldCellInputDto? fieldCellInputDto)
         {
             if (fieldCellInputDto != null)
             {

@@ -9,27 +9,32 @@ namespace mobibank_test.mobi_test_test_project.test
 {
     public class SessionControllerUnitTest
     {
+        public SessionControllerUnitTest()
+        {
+            Environment.SetEnvironmentVariable("FIELD_SIZE", "3");
+        }
+
         [Fact]
-        public void GetSessionByIdTest()
+        public async Task GetSessionByIdTest()
         {
             var session = new Session(1L, 1L, 2L);
             var mockSessionService = new Mock<ISessionService>();
             var mockFieldCellService = new Mock<IFieldCellService>();
             var controller = new SessionController(mockSessionService.Object, mockFieldCellService.Object);
 
-            mockSessionService.Setup(x => x.FindById(1L)).Returns(new Session(session));
+            mockSessionService.Setup(x => x.FindById(1L).Result).Returns(new Session(session));
 
             Assert.Equal(((JsonHttpResult<Session>)Results.Json(session)).Value,
-                         ((JsonHttpResult<Session>)controller.GetSessionById(1)).Value);
+                         ((JsonHttpResult<Session>)await controller.GetSessionById(1)).Value);
 
             session.PlayerYId = 3L;
 
             Assert.NotEqual(((JsonHttpResult<Session>)Results.Json(session)).Value,
-                         ((JsonHttpResult<Session>)controller.GetSessionById(1)).Value);
+                         ((JsonHttpResult<Session>)await controller.GetSessionById(1)).Value);
         }
 
         [Fact]
-        public void GetAllSessionsTest()
+        public async Task GetAllSessionsTest()
         {
             var session1 = new Session(1L, 1L, 2L);
             var session2 = new Session(2L, 2L, 5L);
@@ -38,94 +43,98 @@ namespace mobibank_test.mobi_test_test_project.test
             var mockFieldCellService = new Mock<IFieldCellService>();
             var controller = new SessionController(mockSessionService.Object, mockFieldCellService.Object);
 
-            mockSessionService.Setup(x => x.FindAll()).Returns(new List<Session> { new Session(session1), new Session(session2) });
+            mockSessionService.Setup(x => x.FindAll().Result).Returns(new List<Session> { new Session(session1), new Session(session2) });
 
-            Assert.Equal(((JsonHttpResult<List<Session>>)Results.Json(sessions)).Value, ((JsonHttpResult<List<Session>>)controller.GetAllSessions()).Value);
+            Assert.Equal(((JsonHttpResult<List<Session>>)Results.Json(sessions)).Value,
+                ((JsonHttpResult<List<Session>>)await controller.GetAllSessions()).Value);
 
             session1.PlayerYId = 3L;
 
-            Assert.NotEqual(((JsonHttpResult<List<Session>>)Results.Json(sessions)).Value, ((JsonHttpResult<List<Session>>)controller.GetAllSessions()).Value);
+            Assert.NotEqual(((JsonHttpResult<List<Session>>)Results.Json(sessions)).Value,
+                ((JsonHttpResult<List<Session>>)await controller.GetAllSessions()).Value);
 
             session1.PlayerYId = 2L;
 
-            Assert.Equal(((JsonHttpResult<List<Session>>)Results.Json(sessions)).Value, ((JsonHttpResult<List<Session>>)controller.GetAllSessions()).Value);
+            Assert.Equal(((JsonHttpResult<List<Session>>)Results.Json(sessions)).Value,
+                ((JsonHttpResult<List<Session>>)await controller.GetAllSessions()).Value);
 
             sessions = new List<Session> { session1 };
 
-            Assert.NotEqual(((JsonHttpResult<List<Session>>)Results.Json(sessions)).Value, ((JsonHttpResult<List<Session>>)controller.GetAllSessions()).Value);
+            Assert.NotEqual(((JsonHttpResult<List<Session>>)Results.Json(sessions)).Value,
+                ((JsonHttpResult<List<Session>>)await controller.GetAllSessions()).Value);
         }
 
         [Fact]
-        public void AddNewSessionTest()
+        public async Task AddNewSessionTest()
         {
             var session = new SessionInputDto(new Session(1L, 2L));
             var mockSessionService = new Mock<ISessionService>();
             var mockFieldCellService = new Mock<IFieldCellService>();
             var controller = new SessionController(mockSessionService.Object, mockFieldCellService.Object);
 
-            mockSessionService.Setup(x => x.Add(SessionInputDto.MapToEntity(session))).Returns(new Session(1L, SessionInputDto.MapToEntity(session)));
+            mockSessionService.Setup(x => x.Add(SessionInputDto.MapToEntity(session)).Result).Returns(new Session(1L, SessionInputDto.MapToEntity(session)));
 
             Assert.Equal(((JsonHttpResult<Session>)Results.Json(new Session(1L, SessionInputDto.MapToEntity(session)))).Value,
-                         ((JsonHttpResult<Session>)controller.AddNewSession(session)).Value);
+                         ((JsonHttpResult<Session>)await controller.AddNewSession(session)).Value);
 
             session = null;
-            mockSessionService.Setup(x => x.Add(SessionInputDto.MapToEntity(session))).Returns(SessionInputDto.MapToEntity(session));
+            mockSessionService.Setup(x => x.Add(SessionInputDto.MapToEntity(session)).Result).Returns(SessionInputDto.MapToEntity(session));
 
             Assert.Equal(((BadRequest<StandardProblem>)Results.BadRequest(StandardProblem.SessionBadRequest())).StatusCode,
-                         ((BadRequest<StandardProblem>)controller.AddNewSession(session)).StatusCode);
+                         ((BadRequest<StandardProblem>)await controller.AddNewSession(session)).StatusCode);
             Assert.Equal(((BadRequest<StandardProblem>)Results.BadRequest(StandardProblem.SessionBadRequest())).Value,
-                         ((BadRequest<StandardProblem>)controller.AddNewSession(session)).Value);
+                         ((BadRequest<StandardProblem>)await controller.AddNewSession(session)).Value);
         }
 
         [Fact]
-        public void UpdateSessionTest()
+        public async Task UpdateSessionTest()
         {
             var session = new SessionInputDto(new Session(1, 1L, 2L));
             var mockSessionService = new Mock<ISessionService>();
             var mockFieldCellService = new Mock<IFieldCellService>();
             var controller = new SessionController(mockSessionService.Object, mockFieldCellService.Object);
 
-            mockSessionService.Setup(x => x.FindById(2L)).Returns(new Session(2L, SessionInputDto.MapToEntity(session)));
+            mockSessionService.Setup(x => x.FindById(2L).Result).Returns(new Session(2L, SessionInputDto.MapToEntity(session)));
             session.PlayerYId = 3L;
-            mockSessionService.Setup(x => x.Update(2L, SessionInputDto.MapToEntity(session))).Returns(new Session(2L, SessionInputDto.MapToEntity(session)));
+            mockSessionService.Setup(x => x.Update(2L, SessionInputDto.MapToEntity(session)).Result).Returns(new Session(2L, SessionInputDto.MapToEntity(session)));
 
             Assert.Equal(((JsonHttpResult<Session>)Results.Json(new Session(2L, SessionInputDto.MapToEntity(session)))).Value,
-                         ((JsonHttpResult<Session>)controller.UpdateSession(2L, session)).Value);
+                         ((JsonHttpResult<Session>)await controller.UpdateSession(2L, session)).Value);
 
             session = null;
-            mockSessionService.Setup(x => x.FindById(1L)).Returns(SessionInputDto.MapToEntity(session));
-            mockSessionService.Setup(x => x.Update(1L, SessionInputDto.MapToEntity(session))).Returns(SessionInputDto.MapToEntity(session));
+            mockSessionService.Setup(x => x.FindById(1L).Result).Returns(SessionInputDto.MapToEntity(session));
+            mockSessionService.Setup(x => x.Update(1L, SessionInputDto.MapToEntity(session)).Result).Returns(SessionInputDto.MapToEntity(session));
             
             Assert.Equal(((NotFound<StandardProblem>)Results.NotFound(StandardProblem.SessionNotFound(1L))).StatusCode,
-                            ((NotFound<StandardProblem>)controller.UpdateSession(1L, session)).StatusCode);
+                            ((NotFound<StandardProblem>)await controller.UpdateSession(1L, session)).StatusCode);
             Assert.Equal(((NotFound<StandardProblem>)Results.NotFound(StandardProblem.SessionNotFound(1L))).Value,
-                            ((NotFound<StandardProblem>)controller.UpdateSession(1L, session)).Value);
+                            ((NotFound<StandardProblem>)await controller.UpdateSession(1L, session)).Value);
         }
         
         [Fact]
-        public void DeleteSessionByIdTest()
+        public async Task DeleteSessionByIdTest()
         {
             var mockSessionService = new Mock<ISessionService>();
             var mockFieldCellService = new Mock<IFieldCellService>();
             var controller = new SessionController(mockSessionService.Object, mockFieldCellService.Object);
 
-            mockSessionService.Setup(x => x.DeleteById(1L)).Returns(true);
+            mockSessionService.Setup(x => x.DeleteById(1L).Result).Returns(true);
 
             Assert.Equal(((Ok<string>)Results.Ok($"Игра с id=1 удалена")).StatusCode,
-                         ((Ok<string>)controller.DeleteSessionById(1L)).StatusCode);
+                         ((Ok<string>)await controller.DeleteSessionById(1L)).StatusCode);
             Assert.Equal(((Ok<string>)Results.Ok($"Игра с id=1 удалена")).Value,
-                         ((Ok<string>)controller.DeleteSessionById(1L)).Value);
+                         ((Ok<string>)await controller.DeleteSessionById(1L)).Value);
 
-            mockSessionService.Setup(x => x.DeleteById(2L)).Returns(false);
+            mockSessionService.Setup(x => x.DeleteById(2L).Result).Returns(false);
 
             Assert.Equal(((NotFound<StandardProblem>)Results.NotFound(StandardProblem.SessionNotFound(2L))).StatusCode,
-                         ((NotFound<StandardProblem>)controller.DeleteSessionById(2L)).StatusCode);
+                         ((NotFound<StandardProblem>)await controller.DeleteSessionById(2L)).StatusCode);
             Assert.Equal(((NotFound<StandardProblem>)Results.NotFound(StandardProblem.SessionNotFound(2L))).Value,
-                         ((NotFound<StandardProblem>)controller.DeleteSessionById(2L)).Value);
+                         ((NotFound<StandardProblem>)await controller.DeleteSessionById(2L)).Value);
         }
 
         [Fact]
-        public void GetAllSessionMovesTest()
+        public async Task GetAllSessionMovesTest()
         {
             var session = new Session(1L, 1L, 2L);
             var move1 = new FieldCell(1L, 0, 1, 1L, session.Id);
@@ -136,29 +145,29 @@ namespace mobibank_test.mobi_test_test_project.test
             var mockFieldCellService = new Mock<IFieldCellService>();
             var controller = new SessionController(mockSessionService.Object, mockFieldCellService.Object);
 
-            mockFieldCellService.Setup(x => x.FindAllBySessionId(1L)).Returns(new List<FieldCell> { new FieldCell(move1), new FieldCell(move2) });
+            mockFieldCellService.Setup(x => x.FindAllBySessionId(1L).Result).Returns(new List<FieldCell> { new FieldCell(move1), new FieldCell(move2) });
 
             Assert.Equal(((JsonHttpResult<List<FieldCell>>)Results.Json(moves)).Value,
-                         ((JsonHttpResult<List<FieldCell>>)controller.GetAllSessionMoves(1L)).Value);
+                         ((JsonHttpResult<List<FieldCell>>)await controller.GetAllSessionMoves(1L)).Value);
 
             move1.Y = 2;
 
             Assert.NotEqual(((JsonHttpResult<List<FieldCell>>)Results.Json(moves)).Value,
-                            ((JsonHttpResult<List<FieldCell>>)controller.GetAllSessionMoves(1L)).Value);
+                            ((JsonHttpResult<List<FieldCell>>)await controller.GetAllSessionMoves(1L)).Value);
 
             move1.Y = 1;
 
             Assert.Equal(((JsonHttpResult<List<FieldCell>>)Results.Json(moves)).Value,
-                         ((JsonHttpResult<List<FieldCell>>)controller.GetAllSessionMoves(1L)).Value);
+                         ((JsonHttpResult<List<FieldCell>>)await controller.GetAllSessionMoves(1L)).Value);
 
             moves = new List<FieldCell> { move1 };
 
             Assert.NotEqual(((JsonHttpResult<List<FieldCell>>)Results.Json(moves)).Value,
-                            ((JsonHttpResult<List<FieldCell>>)controller.GetAllSessionMoves(1L)).Value);
+                            ((JsonHttpResult<List<FieldCell>>)await controller.GetAllSessionMoves(1L)).Value);
         }
 
         [Fact]
-        public void AddNewSessionMoveTest()
+        public async Task AddNewSessionMoveTest()
         {
             var session = new Session(1L, 1L, 2L);
             var move = new FieldCellInputDto(new FieldCell(0, 1, session.Id, 1L));
@@ -166,23 +175,23 @@ namespace mobibank_test.mobi_test_test_project.test
             var mockFieldCellService = new Mock<IFieldCellService>();
             var controller = new SessionController(mockSessionService.Object, mockFieldCellService.Object);
 
-            mockSessionService.Setup(x => x.FindById(session.Id)).Returns(session);
-            mockFieldCellService.Setup(x => x.Add(FieldCellInputDto.MapToEntity(move))).Returns(new FieldCell(1L, FieldCellInputDto.MapToEntity(move)));
+            mockSessionService.Setup(x => x.FindById(session.Id).Result).Returns(session);
+            mockFieldCellService.Setup(x => x.Add(FieldCellInputDto.MapToEntity(move)).Result).Returns(new FieldCell(1L, FieldCellInputDto.MapToEntity(move)));
 
             Assert.Equal(((JsonHttpResult<FieldCell>)Results.Json(new FieldCell(1L, FieldCellInputDto.MapToEntity(move)))).Value,
-                         ((JsonHttpResult<FieldCell>)controller.AddNewSessionMove(1L, move)).Value);
+                         ((JsonHttpResult<FieldCell>)await controller.AddNewSessionMove(1L, move)).Value);
 
             move = null;
-            mockFieldCellService.Setup(x => x.Add(FieldCellInputDto.MapToEntity(move))).Returns(FieldCellInputDto.MapToEntity(move));
+            mockFieldCellService.Setup(x => x.Add(FieldCellInputDto.MapToEntity(move)).Result).Returns(FieldCellInputDto.MapToEntity(move));
             
             Assert.Equal(((BadRequest<StandardProblem>)Results.BadRequest(StandardProblem.FieldBadRequest(1L, 0L))).StatusCode,
-                         ((BadRequest<StandardProblem>)controller.AddNewSessionMove(1L, move)).StatusCode);
+                         ((BadRequest<StandardProblem>)await controller.AddNewSessionMove(1L, move)).StatusCode);
             Assert.Equal(((BadRequest<StandardProblem>)Results.BadRequest(StandardProblem.FieldBadRequest(1L, 0L))).Value,
-                         ((BadRequest<StandardProblem>)controller.AddNewSessionMove(1L, move)).Value);
+                         ((BadRequest<StandardProblem>)await controller.AddNewSessionMove(1L, move)).Value);
         }
 
         [Fact]
-        public void UpdateSessionMoveTest()
+        public async Task UpdateSessionMoveTest()
         {
             var session = new Session(1L, 1L, 2L);
             var move = new FieldCellInputDto(new FieldCell(0, 1, session.Id, 1L));
@@ -190,44 +199,44 @@ namespace mobibank_test.mobi_test_test_project.test
             var mockFieldCellService = new Mock<IFieldCellService>();
             var controller = new SessionController(mockSessionService.Object, mockFieldCellService.Object);
 
-            mockSessionService.Setup(x => x.FindById(session.Id)).Returns(session);
-            mockFieldCellService.Setup(x => x.FindById(2L)).Returns(new FieldCell(2L, FieldCellInputDto.MapToEntity(move)));
+            mockSessionService.Setup(x => x.FindById(session.Id).Result).Returns(session);
+            mockFieldCellService.Setup(x => x.FindById(2L).Result).Returns(new FieldCell(2L, FieldCellInputDto.MapToEntity(move)));
             move.Y = 2;
-            mockFieldCellService.Setup(x => x.Update(2L, FieldCellInputDto.MapToEntity(move))).Returns(new FieldCell(2L, FieldCellInputDto.MapToEntity(move)));
+            mockFieldCellService.Setup(x => x.Update(2L, FieldCellInputDto.MapToEntity(move)).Result).Returns(new FieldCell(2L, FieldCellInputDto.MapToEntity(move)));
 
             Assert.Equal(((JsonHttpResult<FieldCell>)Results.Json(new FieldCell(2L, FieldCellInputDto.MapToEntity(move)))).Value,
-                         ((JsonHttpResult<FieldCell>)controller.UpdateSessionMove(session.Id, 2L, move)).Value);
+                         ((JsonHttpResult<FieldCell>)await controller.UpdateSessionMove(session.Id, 2L, move)).Value);
 
             move = null;
-            mockFieldCellService.Setup(x => x.FindById(1L)).Returns(FieldCellInputDto.MapToEntity(move));
+            mockFieldCellService.Setup(x => x.FindById(1L).Result).Returns(FieldCellInputDto.MapToEntity(move));
 
             Assert.Equal(((NotFound<StandardProblem>)Results.NotFound(StandardProblem.FieldNotFound(session.Id, 1L))).StatusCode,
-                            ((NotFound<StandardProblem>)controller.UpdateSessionMove(session.Id, 1L, move)).StatusCode);
+                            ((NotFound<StandardProblem>)await controller.UpdateSessionMove(session.Id, 1L, move)).StatusCode);
             Assert.Equal(((NotFound<StandardProblem>)Results.NotFound(StandardProblem.FieldNotFound(session.Id, 1L))).Value,
-                            ((NotFound<StandardProblem>)controller.UpdateSessionMove(session.Id, 1L, move)).Value);
+                            ((NotFound<StandardProblem>)await controller.UpdateSessionMove(session.Id, 1L, move)).Value);
         }
         
         [Fact]
-        public void DeleteMoveByIdTest()
+        public async Task DeleteMoveByIdTest()
         {
             var mockSessionService = new Mock<ISessionService>();
             var mockFieldCellService = new Mock<IFieldCellService>();
             var controller = new SessionController(mockSessionService.Object, mockFieldCellService.Object);
 
-            mockSessionService.Setup(x => x.FindById(2L)).Returns(new Session(2L, 2L, 1L));
-            mockFieldCellService.Setup(x => x.DeleteById(1L)).Returns(true);
+            mockSessionService.Setup(x => x.FindById(2L).Result).Returns(new Session(2L, 2L, 1L));
+            mockFieldCellService.Setup(x => x.DeleteById(1L).Result).Returns(true);
 
             Assert.Equal(((Ok<string>)Results.Ok($"Ход с id=1 удалён")).StatusCode,
-                         ((Ok<string>)controller.DeleteMoveByMoveId(2L, 1L)).StatusCode);
+                         ((Ok<string>)await controller.DeleteMoveByMoveId(2L, 1L)).StatusCode);
             Assert.Equal(((Ok<string>)Results.Ok($"Ход с id=1 удалён")).Value,
-                         ((Ok<string>)controller.DeleteMoveByMoveId(2L, 1L)).Value);
+                         ((Ok<string>)await controller.DeleteMoveByMoveId(2L, 1L)).Value);
 
-            mockFieldCellService.Setup(x => x.DeleteById(2L)).Returns(false);
+            mockFieldCellService.Setup(x => x.DeleteById(2L).Result).Returns(false);
 
             Assert.Equal(((NotFound<StandardProblem>)Results.NotFound(StandardProblem.FieldNotFound(2L, 2L))).StatusCode,
-                         ((NotFound<StandardProblem>)controller.DeleteMoveByMoveId(2L, 2L)).StatusCode);
+                         ((NotFound<StandardProblem>)await controller.DeleteMoveByMoveId(2L, 2L)).StatusCode);
             Assert.Equal(((NotFound<StandardProblem>)Results.NotFound(StandardProblem.FieldNotFound(2L, 2L))).Value,
-                         ((NotFound<StandardProblem>)controller.DeleteMoveByMoveId(2L, 2L)).Value);
+                         ((NotFound<StandardProblem>)await controller.DeleteMoveByMoveId(2L, 2L)).Value);
         }
     }
 }

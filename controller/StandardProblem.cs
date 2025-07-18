@@ -20,7 +20,7 @@ namespace mobibank_test.controller
             Instance = instance;
         }
 
-        public override bool Equals(object obj)
+        public override bool Equals(object? obj)
         {
             var problem = obj as StandardProblem;
 

@@ -12,33 +12,33 @@ namespace mobibank_test.service.impl
             SessionRepository = sessionRepository;
         }
 
-        public Session? FindById(long id)
+        public async Task<Session?> FindById(long id)
         {
-            return SessionRepository.FindById(id);
+            return await SessionRepository.FindById(id);
         }
 
-        public List<Session> FindAll()
+        public async Task<List<Session>> FindAll()
         {
-            return SessionRepository.FindAll();
+            return await SessionRepository.FindAll();
         }
 
-        public Session Add(Session entity)
+        public async Task<Session> Add(Session entity)
         {
             Session session = new Session(0, entity);
 
-            return SessionRepository.Save(session);
+            return await SessionRepository.Save(session);
         }
 
-        public Session Update(long id, Session entity)
+        public async Task<Session> Update(long id, Session entity)
         {
             Session session = new Session(id, entity);
 
-            return SessionRepository.Save(session);
+            return await SessionRepository.Save(session);
         }
 
-        public bool DeleteById(long id)
+        public async Task<bool> DeleteById(long id)
         {
-            return SessionRepository.DeleteById(id);
+            return await SessionRepository.DeleteById(id);
         }
     }
 }
