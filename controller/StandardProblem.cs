@@ -202,5 +202,36 @@ namespace mobibank_test.controller
                 Instance = $"/{id}/moves/{moveId}"
             };
         }
+
+        public static ProblemDetails FieldIsNotEmpty(long id)
+        {
+            return new ProblemDetails
+            {
+                Type = "about:blank",
+                Status = (int)HttpStatusCode.Forbidden,
+                Title = "Ячейка уже заполнена",
+                Detail = "На данную ячейку в этой игре уже поставлен знак",
+                Instance = $"/{id}/moves"
+            };
+        }
+
+        public static ProblemDetails FieldIsNotEmpty(long id, long moveId)
+        {
+            if (moveId > 0L)
+            {
+                return new ProblemDetails
+                {
+                    Type = "about:blank",
+                    Status = (int)HttpStatusCode.Forbidden,
+                    Title = "Ячейка уже заполнена",
+                    Detail = "На данную ячейку в этой игре уже поставлен знак",
+                    Instance = $"/{id}/moves/{moveId}"
+                };
+            }
+            else
+            {
+                return FieldIsNotEmpty(id);
+            }
+        }
     }
 }

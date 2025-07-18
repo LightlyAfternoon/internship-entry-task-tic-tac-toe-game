@@ -185,6 +185,15 @@ namespace mobibank_test.controller
                     return Results.NotFound(StandardProblem.SessionNotFound(id, 0L));
                 }
 
+                foreach (FieldCell existedFieldCell in session.Cells)
+                {
+                    if (existedFieldCell.SessionId == fieldCell.SessionId
+                        && existedFieldCell.X == fieldCell.X && existedFieldCell.Y == fieldCell.Y)
+                    {
+                        return Results.Problem(StandardProblem.FieldIsNotEmpty(id));
+                    }
+                }
+
                 if (session.Cells.Count > 0 && session.Cells.Count % 3 == 0)
                 {
                     double chancePercentage = 10 / 100;
@@ -195,6 +204,7 @@ namespace mobibank_test.controller
                         fieldCell = ReverseFieldCellOwner(session, fieldCell);
                     }
                 }
+
                 fieldCell = await FieldCellService.Add(fieldCell);
             }
 
@@ -214,14 +224,26 @@ namespace mobibank_test.controller
         [HttpPut("{id}/moves/{moveId}")]
         public async Task<IResult> UpdateSessionMove(long id, long moveId, [FromBody] FieldCellInputDto fieldCellInputDto)
         {
-            if (await SessionService.FindById(id) == null)
+            FieldCell fieldCell = FieldCellInputDto.MapToEntity(fieldCellInputDto);
+
+            Session session = await SessionService.FindById(id);
+            if (session == null)
                 return Results.NotFound(StandardProblem.SessionNotFound(id, moveId));
             else if (await FieldCellService.FindById(moveId) == null)
                 return Results.NotFound(StandardProblem.FieldNotFound(id, moveId));
             else if (await FieldCellService.FindById(moveId) != null && (await FieldCellService.FindById(moveId)).SessionId != id)
                 return Results.Problem(StandardProblem.FieldForbidden(id, moveId));
 
-            FieldCell fieldCell = await FieldCellService.Update(moveId, FieldCellInputDto.MapToEntity(fieldCellInputDto));
+            foreach (FieldCell existedFieldCell in session.Cells)
+            {
+                if (existedFieldCell.SessionId == id && existedFieldCell.Id != moveId
+                    && existedFieldCell.X == fieldCell.X && existedFieldCell.Y == fieldCell.Y)
+                {
+                    return Results.Problem(StandardProblem.FieldIsNotEmpty(id, moveId));
+                }
+            }
+
+            fieldCell = await FieldCellService.Update(moveId, FieldCellInputDto.MapToEntity(fieldCellInputDto));
 
             if (fieldCell != null)
                 return Results.Json(fieldCell);

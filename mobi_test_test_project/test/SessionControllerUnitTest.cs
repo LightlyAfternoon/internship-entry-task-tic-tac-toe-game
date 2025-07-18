@@ -181,6 +181,8 @@ namespace mobibank_test.mobi_test_test_project.test
             Assert.Equal(((JsonHttpResult<FieldCell>)Results.Json(new FieldCell(1L, FieldCellInputDto.MapToEntity(move)))).Value,
                          ((JsonHttpResult<FieldCell>)await controller.AddNewSessionMove(1L, move)).Value);
 
+            session.Cells.Add(FieldCellInputDto.MapToEntity(move));
+
             move = null;
             mockFieldCellService.Setup(x => x.Add(FieldCellInputDto.MapToEntity(move)).Result).Returns(FieldCellInputDto.MapToEntity(move));
             
@@ -188,6 +190,17 @@ namespace mobibank_test.mobi_test_test_project.test
                          ((BadRequest<StandardProblem>)await controller.AddNewSessionMove(1L, move)).StatusCode);
             Assert.Equal(((BadRequest<StandardProblem>)Results.BadRequest(StandardProblem.FieldBadRequest(1L, 0L))).Value,
                          ((BadRequest<StandardProblem>)await controller.AddNewSessionMove(1L, move)).Value);
+
+            var existedMove = new FieldCellInputDto(new FieldCell(0, 1, session.Id, 2L));
+
+            Assert.Equal(((ProblemHttpResult)Results.Problem(StandardProblem.FieldIsNotEmpty(1L, 0L))).StatusCode,
+                         ((ProblemHttpResult)await controller.AddNewSessionMove(1L, existedMove)).StatusCode);
+            Assert.Equal(((ProblemHttpResult)Results.Problem(StandardProblem.FieldIsNotEmpty(1L))).ProblemDetails.Title,
+                         ((ProblemHttpResult)await controller.AddNewSessionMove(1L, existedMove)).ProblemDetails.Title);
+            Assert.Equal(((ProblemHttpResult)Results.Problem(StandardProblem.FieldIsNotEmpty(1L))).ProblemDetails.Detail,
+                         ((ProblemHttpResult)await controller.AddNewSessionMove(1L, existedMove)).ProblemDetails.Detail);
+            Assert.Equal(((ProblemHttpResult)Results.Problem(StandardProblem.FieldIsNotEmpty(1L))).ProblemDetails.Instance,
+                         ((ProblemHttpResult)await controller.AddNewSessionMove(1L, existedMove)).ProblemDetails.Instance);
         }
 
         [Fact]
@@ -207,6 +220,8 @@ namespace mobibank_test.mobi_test_test_project.test
             Assert.Equal(((JsonHttpResult<FieldCell>)Results.Json(new FieldCell(2L, FieldCellInputDto.MapToEntity(move)))).Value,
                          ((JsonHttpResult<FieldCell>)await controller.UpdateSessionMove(session.Id, 2L, move)).Value);
 
+            session.Cells.Add(new FieldCell(2L, FieldCellInputDto.MapToEntity(move)));
+
             move = null;
             mockFieldCellService.Setup(x => x.FindById(1L).Result).Returns(FieldCellInputDto.MapToEntity(move));
 
@@ -214,6 +229,19 @@ namespace mobibank_test.mobi_test_test_project.test
                             ((NotFound<StandardProblem>)await controller.UpdateSessionMove(session.Id, 1L, move)).StatusCode);
             Assert.Equal(((NotFound<StandardProblem>)Results.NotFound(StandardProblem.FieldNotFound(session.Id, 1L))).Value,
                             ((NotFound<StandardProblem>)await controller.UpdateSessionMove(session.Id, 1L, move)).Value);
+
+            var existedMove = new FieldCellInputDto(new FieldCell(0, 2, session.Id, 2L));
+
+            mockFieldCellService.Setup(x => x.FindById(3L).Result).Returns(new FieldCell(3L, FieldCellInputDto.MapToEntity(existedMove)));
+
+            Assert.Equal(((ProblemHttpResult)Results.Problem(StandardProblem.FieldIsNotEmpty(session.Id, 3L))).StatusCode,
+                         ((ProblemHttpResult)await controller.UpdateSessionMove(session.Id, 3L, existedMove)).StatusCode);
+            Assert.Equal(((ProblemHttpResult)Results.Problem(StandardProblem.FieldIsNotEmpty(1L, 3L))).ProblemDetails.Title,
+                         ((ProblemHttpResult)await controller.UpdateSessionMove(session.Id, 3L, existedMove)).ProblemDetails.Title);
+            Assert.Equal(((ProblemHttpResult)Results.Problem(StandardProblem.FieldIsNotEmpty(1L, 3L))).ProblemDetails.Detail,
+                         ((ProblemHttpResult)await controller.UpdateSessionMove(session.Id, 3L, existedMove)).ProblemDetails.Detail);
+            Assert.Equal(((ProblemHttpResult)Results.Problem(StandardProblem.FieldIsNotEmpty(1L, 3L))).ProblemDetails.Instance,
+                         ((ProblemHttpResult)await controller.UpdateSessionMove(session.Id, 3L, existedMove)).ProblemDetails.Instance);
         }
         
         [Fact]
