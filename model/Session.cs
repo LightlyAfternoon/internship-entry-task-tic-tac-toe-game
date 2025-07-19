@@ -109,9 +109,6 @@ namespace mobibank_test.model
             else
                 return PlayerYId;
         }
-
-        // TODO: исправить луп
-
         public bool IsWinCondition(FieldCell cell)
         {
             int winCondition = int.Parse(Environment.GetEnvironmentVariable("WIN_CONDITION"));
