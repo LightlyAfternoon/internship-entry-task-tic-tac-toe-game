@@ -166,12 +166,12 @@ namespace mobibank_test.controller
 
         public static StandardProblem FieldBadRequest(long id)
         {
-                return new StandardProblem(
-                        type: "about:blank",
-                        status: HttpStatusCode.BadRequest,
-                        title: "Некорректные данные",
-                        detail: "Отсутствуют необходимые поля",
-                        instance: $"/{id}/moves");
+            return new StandardProblem(
+                    type: "about:blank",
+                    status: HttpStatusCode.BadRequest,
+                    title: "Некорректные данные",
+                    detail: "Отсутствуют необходимые поля",
+                    instance: $"/{id}/moves");
         }
 
         public static StandardProblem FieldBadRequest(long id, long moveId)
@@ -231,6 +231,63 @@ namespace mobibank_test.controller
             else
             {
                 return FieldIsNotEmpty(id);
+            }
+        }
+
+        public static ProblemDetails FieldIsNotCurrentTurnPlayer(long id)
+        {
+            return new ProblemDetails
+            {
+                Type = "about:blank",
+                Status = (int)HttpStatusCode.Forbidden,
+                Title = "Не ваш ход",
+                Detail = "На данный момент ходить должен другой игрок",
+                Instance = $"/{id}/moves"
+            };
+        }
+
+        public static ProblemDetails FieldIsNotCurrentTurnPlayer(long id, long moveId)
+        {
+            if (moveId > 0L)
+            {
+                return new ProblemDetails
+                {
+                    Type = "about:blank",
+                    Status = (int)HttpStatusCode.Forbidden,
+                    Title = "Не ваш ход",
+                    Detail = "На данный момент ходить должен другой игрок",
+                    Instance = $"/{id}/moves/{moveId}"
+                };
+            }
+            else
+            {
+                return FieldIsNotEmpty(id);
+            }
+        }
+
+        public static ProblemDetails SessionAlreadyEnded(long id, long moveId)
+        {
+            if (moveId > 0L)
+            {
+                return new ProblemDetails
+                {
+                    Type = "about:blank",
+                    Status = (int)HttpStatusCode.Forbidden,
+                    Title = "Игра уже законченна",
+                    Detail = $"Нельзя добавить новый ход в уже законченную игру с id={id}",
+                    Instance = $"/games/{id}/moves/{moveId}"
+                };
+            }
+            else
+            {
+                return new ProblemDetails
+                {
+                    Type = "about:blank",
+                    Status = (int)HttpStatusCode.Forbidden,
+                    Title = "Игра уже законченна",
+                    Detail = $"Нельзя добавить новый ход в уже законченную игру с id={id}",
+                    Instance = $"/games/{id}/moves"
+                };
             }
         }
     }

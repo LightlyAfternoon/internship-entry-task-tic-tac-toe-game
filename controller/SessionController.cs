@@ -1,8 +1,8 @@
-using System.Net;
 using Microsoft.AspNetCore.Mvc;
 using mobibank_test.controller.dto;
 using mobibank_test.model;
 using mobibank_test.service;
+using System.Net;
 
 namespace mobibank_test.controller
 {
@@ -180,6 +180,12 @@ namespace mobibank_test.controller
             {
                 fieldCell.SessionId = id;
                 Session session = await SessionService.FindById(id);
+
+                if (session.IsEnded)
+                {
+                    return Results.Problem(StandardProblem.SessionAlreadyEnded(id, 0L));
+                }
+
                 if (session == null)
                 {
                     return Results.NotFound(StandardProblem.SessionNotFound(id, 0L));
@@ -194,6 +200,17 @@ namespace mobibank_test.controller
                     }
                 }
 
+                if (fieldCell.OccupiedByUserId != session.GetCurrentTurnPlayerId())
+                {
+                    return Results.Problem(StandardProblem.FieldIsNotCurrentTurnPlayer(id));
+                }
+
+                if (session.IsWinCondition(fieldCell))
+                {
+                    session.WinnerId = fieldCell.OccupiedByUserId;
+                    session.IsEnded = true;
+                }
+
                 if (session.Cells.Count > 0 && session.Cells.Count % 3 == 0)
                 {
                     double chancePercentage = 10 / 100;
@@ -206,6 +223,13 @@ namespace mobibank_test.controller
                 }
 
                 fieldCell = await FieldCellService.Add(fieldCell);
+
+                if (session.AllFieldIsFull())
+                {
+                    session.IsEnded = true;
+
+                    session = await SessionService.Update(session.Id, session);
+                }
             }
 
             if (fieldCell != null)
@@ -245,6 +269,13 @@ namespace mobibank_test.controller
 
             fieldCell = await FieldCellService.Update(moveId, FieldCellInputDto.MapToEntity(fieldCellInputDto));
 
+            if (session.AllFieldIsFull())
+            {
+                session.IsEnded = true;
+
+                session = await SessionService.Update(session.Id, session);
+            }
+
             if (fieldCell != null)
                 return Results.Json(fieldCell);
             else
@@ -275,7 +306,7 @@ namespace mobibank_test.controller
 
         private FieldCell ReverseFieldCellOwner(Session session, FieldCell cell)
         {
-            if (session.GetCurrentTurnPlayer() == session.PlayerX)
+            if (session.GetCurrentTurnPlayerId() == session.PlayerXId)
                 cell.OccupiedByUserId = session.PlayerYId;
             else
                 cell.OccupiedByUserId = session.PlayerXId;

@@ -102,12 +102,252 @@ namespace mobibank_test.model
             Cells = new List<FieldCell>();
         }
 
-        public User GetCurrentTurnPlayer()
+        public long GetCurrentTurnPlayerId()
         {
             if (Cells.Count % 2 == 0)
-                return PlayerX;
+                return PlayerXId;
             else
-                return PlayerY;
+                return PlayerYId;
+        }
+
+        // TODO: исправить луп
+
+        public bool IsWinCondition(FieldCell cell)
+        {
+            int winCondition = int.Parse(Environment.GetEnvironmentVariable("WIN_CONDITION"));
+            int winCountPlayer = 1;
+            FieldCell[,] cells = new FieldCell[FieldSize, FieldSize];
+
+            for (int x = 0; x < FieldSize; x++)
+            {
+                for (int y = 0; y < FieldSize; y++)
+                {
+                    cells[x, y] = Cells.FirstOrDefault(c => c.X == x && c.Y == y);
+                }
+            }
+
+            int yI = cell.Y;
+
+            while (yI < FieldSize)
+            {
+                if (cells[cell.X, yI] != null && cells[cell.X, yI].OccupiedByUserId == cell.OccupiedByUserId)
+                {
+                    winCountPlayer++;
+
+                    if (winCountPlayer >= winCondition)
+                    {
+                        return true;
+                    }
+                }
+                else
+                {
+                    break;
+                }
+
+                yI++;
+            }
+
+            if (cell.Y > 0)
+            {
+                yI = cell.Y - 1;
+
+                while (yI > -1)
+                {
+                    if (cells[cell.X, yI] != null && cells[cell.X, yI].OccupiedByUserId == cell.OccupiedByUserId)
+                    {
+                        winCountPlayer++;
+
+                        if (winCountPlayer >= winCondition)
+                        {
+                            return true;
+                        }
+                    }
+                    else
+                    {
+                        break;
+                    }
+
+                    yI--;
+                }
+            }
+
+            winCountPlayer = 0;
+
+            int xI = cell.X;
+
+            while (xI < FieldSize)
+            {
+                if (cells[xI, cell.Y] != null && cells[xI, cell.Y].OccupiedByUserId == cell.OccupiedByUserId)
+                {
+                    winCountPlayer++;
+
+                    if (winCountPlayer >= winCondition)
+                    {
+                        return true;
+                    }
+                }
+                else
+                {
+                    break;
+                }
+
+                xI++;
+            }
+
+            if (cell.X > 0)
+            {
+                xI = cell.X - 1;
+
+                while (xI > -1)
+                {
+                    if (cells[xI, cell.Y] != null && cells[xI, cell.Y].OccupiedByUserId == cell.OccupiedByUserId)
+                    {
+                        winCountPlayer++;
+
+                        if (winCountPlayer >= winCondition)
+                        {
+                            return true;
+                        }
+                    }
+                    else
+                    {
+                        break;
+                    }
+
+                    xI--;
+                }
+            }
+
+            winCountPlayer = 0;
+
+            xI = cell.X + 1;
+            yI = cell.Y + 1;
+
+            while (xI < FieldSize && yI < FieldSize)
+            {
+                if (cells[xI, yI] != null && cells[xI, yI].OccupiedByUserId == cell.OccupiedByUserId)
+                {
+                    winCountPlayer++;
+
+                    if (winCountPlayer >= winCondition)
+                    {
+                        return true;
+                    }
+                }
+                else
+                {
+                    break;
+                }
+
+                xI++;
+                yI++;
+            }
+
+
+            if (cell.X > 0 && cell.Y > 0)
+            {
+                xI = cell.X - 1;
+                yI = cell.Y - 1;
+
+                while (xI > -1 && yI > -1)
+                {
+                    if (cells[xI, yI] != null && cells[xI, yI].OccupiedByUserId == cell.OccupiedByUserId)
+                    {
+                        winCountPlayer++;
+
+                        if (winCountPlayer >= winCondition)
+                        {
+                            return true;
+                        }
+                    }
+                    else
+                    {
+                        break;
+                    }
+
+                    xI--;
+                    yI--;
+                }
+            }
+
+            winCountPlayer = 0;
+
+            xI = cell.X - 1;
+            yI = cell.Y + 1;
+
+            while (xI > -1 && yI < FieldSize)
+            {
+                if (cells[xI, yI] != null && cells[xI, yI].OccupiedByUserId == cell.OccupiedByUserId)
+                {
+                    winCountPlayer++;
+
+                    if (winCountPlayer >= winCondition)
+                    {
+                        return true;
+                    }
+                }
+                else
+                {
+                    break;
+                }
+
+                xI--;
+                yI++;
+            }
+
+            if (cell.X > 0 && cell.Y < FieldSize)
+            {
+                xI = cell.X + 1;
+                yI = cell.Y - 1;
+
+                while (xI < FieldSize && yI > -1)
+                {
+                    if (cells[xI, yI] != null && cells[xI, yI].OccupiedByUserId == cell.OccupiedByUserId)
+                    {
+                        winCountPlayer++;
+
+                        if (winCountPlayer >= winCondition)
+                        {
+                            return true;
+                        }
+                    }
+                    else
+                    {
+                        break;
+                    }
+
+                    xI++;
+                    yI--;
+                }
+            }
+
+            return false;
+        }
+
+        public bool AllFieldIsFull()
+        {
+            FieldCell[,] cells = new FieldCell[FieldSize, FieldSize];
+
+            for (int x = 0; x < FieldSize; x++)
+            {
+                for (int y = 0; y < FieldSize; y++)
+                {
+                    cells[x, y] = Cells.FirstOrDefault(c => c.X == x && c.Y == y);
+                }
+            }
+
+            for (int x = 0; x < FieldSize; x++)
+            {
+                for (int y = 0; y < FieldSize; y++)
+                {
+                    if (cells[x, y] == null)
+                    {
+                        return false;
+                    }
+                }
+            }
+
+            return true;
         }
 
         public override bool Equals(object? obj)

@@ -12,6 +12,7 @@ namespace mobibank_test.mobi_test_test_project.test
         public SessionControllerUnitTest()
         {
             Environment.SetEnvironmentVariable("FIELD_SIZE", "3");
+            Environment.SetEnvironmentVariable("WIN_CONDITION", "3");
         }
 
         [Fact]
@@ -193,7 +194,7 @@ namespace mobibank_test.mobi_test_test_project.test
 
             var existedMove = new FieldCellInputDto(new FieldCell(0, 1, session.Id, 2L));
 
-            Assert.Equal(((ProblemHttpResult)Results.Problem(StandardProblem.FieldIsNotEmpty(1L, 0L))).StatusCode,
+            Assert.Equal(((ProblemHttpResult)Results.Problem(StandardProblem.FieldIsNotEmpty(1L))).StatusCode,
                          ((ProblemHttpResult)await controller.AddNewSessionMove(1L, existedMove)).StatusCode);
             Assert.Equal(((ProblemHttpResult)Results.Problem(StandardProblem.FieldIsNotEmpty(1L))).ProblemDetails.Title,
                          ((ProblemHttpResult)await controller.AddNewSessionMove(1L, existedMove)).ProblemDetails.Title);
@@ -201,6 +202,32 @@ namespace mobibank_test.mobi_test_test_project.test
                          ((ProblemHttpResult)await controller.AddNewSessionMove(1L, existedMove)).ProblemDetails.Detail);
             Assert.Equal(((ProblemHttpResult)Results.Problem(StandardProblem.FieldIsNotEmpty(1L))).ProblemDetails.Instance,
                          ((ProblemHttpResult)await controller.AddNewSessionMove(1L, existedMove)).ProblemDetails.Instance);
+
+            var notCurrentPlayerMove = new FieldCellInputDto(new FieldCell(2, 1, session.Id, 1L));
+
+            Assert.Equal(((ProblemHttpResult)Results.Problem(StandardProblem.FieldIsNotCurrentTurnPlayer(1L))).StatusCode,
+                         ((ProblemHttpResult)await controller.AddNewSessionMove(1L, notCurrentPlayerMove)).StatusCode);
+            Assert.Equal(((ProblemHttpResult)Results.Problem(StandardProblem.FieldIsNotCurrentTurnPlayer(1L))).ProblemDetails.Title,
+                         ((ProblemHttpResult)await controller.AddNewSessionMove(1L, notCurrentPlayerMove)).ProblemDetails.Title);
+            Assert.Equal(((ProblemHttpResult)Results.Problem(StandardProblem.FieldIsNotCurrentTurnPlayer(1L))).ProblemDetails.Detail,
+                         ((ProblemHttpResult)await controller.AddNewSessionMove(1L, notCurrentPlayerMove)).ProblemDetails.Detail);
+            Assert.Equal(((ProblemHttpResult)Results.Problem(StandardProblem.FieldIsNotCurrentTurnPlayer(1L))).ProblemDetails.Instance,
+                         ((ProblemHttpResult)await controller.AddNewSessionMove(1L, notCurrentPlayerMove)).ProblemDetails.Instance);
+
+            var secondMove = new FieldCellInputDto(new FieldCell(1, 1, session.Id, 2L));
+            var thirdMove = new FieldCellInputDto(new FieldCell(0, 0, session.Id, 1L));
+            var fourthMove = new FieldCellInputDto(new FieldCell(2, 2, session.Id, 2L));
+            var fifthMove = new FieldCellInputDto(new FieldCell(0, 2, session.Id, 1L));
+            session.Cells.Add(FieldCellInputDto.MapToEntity(secondMove));
+            session.Cells.Add(FieldCellInputDto.MapToEntity(thirdMove));
+            session.Cells.Add(FieldCellInputDto.MapToEntity(fourthMove));
+
+            var fifthFieldCell = new FieldCell(5L, FieldCellInputDto.MapToEntity(fifthMove));
+            mockFieldCellService.Setup(x => x.Add(FieldCellInputDto.MapToEntity(fifthMove)).Result).Returns(fifthFieldCell);
+
+            fifthFieldCell.Session = session;
+
+            Assert.True(((JsonHttpResult<FieldCell>)await controller.AddNewSessionMove(1L, fifthMove)).Value.Session.IsEnded);
         }
 
         [Fact]
