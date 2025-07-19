@@ -205,12 +205,6 @@ namespace mobibank_test.controller
                     return Results.Problem(StandardProblem.FieldIsNotCurrentTurnPlayer(id));
                 }
 
-                if (session.IsWinCondition(fieldCell))
-                {
-                    session.WinnerId = fieldCell.OccupiedByUserId;
-                    session.IsEnded = true;
-                }
-
                 if (session.Cells.Count > 0 && session.Cells.Count % 3 == 0)
                 {
                     double chancePercentage = 10 / 100;
@@ -223,6 +217,12 @@ namespace mobibank_test.controller
                 }
 
                 fieldCell = await FieldCellService.Add(fieldCell);
+
+                if (session.IsWinCondition(fieldCell))
+                {
+                    session.WinnerId = fieldCell.OccupiedByUserId;
+                    session.IsEnded = true;
+                }
 
                 if (session.AllFieldIsFull())
                 {
