@@ -5,7 +5,16 @@
 Должен поддерживаться формат сообщений json.
 
 ## API
+
 http://localhost:8080/swagger/index.html
+
+## Архитектура
+
+- Папка controller содержит API с эндпоинтами - Web API от ASP.NET Core
+- Папка model содержит сущности БД
+- Папка repository содержит классы с методами для работы с БД - используется Entity Framework Core в качестве ORM
+- Папка service содержит классы с бизнес-логикой приложения
+- Папка mobi_test_test_project содержит тесты - используются библиотеки xUnit и Moq
 
 ## Описание
 
