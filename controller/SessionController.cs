@@ -25,6 +25,7 @@ namespace mobibank_test.controller
         /// </summary>
         /// <param name="id">id игры</param>
         /// <returns>Игру с указанным id</returns>
+        /// <response code="200">Если игра успешно найдена</response>
         /// <response code="404">Если игра с данным id не найдена</response>
         [HttpGet("{id}")]
         public async Task<IResult> GetSessionById(long id)
@@ -41,6 +42,7 @@ namespace mobibank_test.controller
         /// Получение списка всех игр
         /// </summary>
         /// <returns>Все игры</returns>
+        /// <response code="200">Если игры успешно найдены</response>
         [HttpGet]
         public async Task<IResult> GetAllSessions()
         {
@@ -66,6 +68,7 @@ namespace mobibank_test.controller
         /// </remarks>
         /// <param name="session">Данные игры</param>
         /// <returns>Новую игру</returns>
+        /// <response code="200">Если игра успешно добавлена</response>
         /// <response code="400">Если session=null</response>
         [HttpPost]
         public async Task<IResult> AddNewSession([FromBody] SessionInputDto sessionInputDto)
@@ -101,6 +104,7 @@ namespace mobibank_test.controller
         /// <param name="id">id игры</param>
         /// <param name="session">Данные игры</param>
         /// <returns>Игру с изменёнными данными</returns>
+        /// <response code="200">Если игра успешно изменена</response>
         /// <response code="400">Если session=null</response>
         /// <response code="404">Если игра с данным id не найдена</response>
         [HttpPut("{id}")]
@@ -145,6 +149,7 @@ namespace mobibank_test.controller
         /// </summary>
         /// <param name="id">id игры</param>
         /// <returns>Все ходы, сделанные за игру</returns>
+        /// <response code="200">Если ход успешно найден</response>
         [HttpGet("{id}/moves")]
         public async Task<IResult> GetAllSessionMoves(long id)
         {
@@ -171,6 +176,10 @@ namespace mobibank_test.controller
         /// <param name="id">id игры</param>
         /// <param name="fieldCell">Данные клетки поля</param>
         /// <returns></returns>
+        /// <response code="200">Если ход успешно добавлен</response>
+        /// <response code="403">Если игра уже окончена, ячейка с указанными x и y уже занята или ходить должен другой игрок</response>
+        /// <response code="404">Если игра с данным id не найдена</response>
+        /// <response code="400">Если fieldCell=null</response>
         [HttpPost("{id}/moves")]
         public async Task<IResult> AddNewSessionMove(long id, [FromBody] FieldCellInputDto fieldCellInputDto)
         {
@@ -205,31 +214,7 @@ namespace mobibank_test.controller
                     return Results.Problem(StandardProblem.FieldIsNotCurrentTurnPlayer(id));
                 }
 
-                if (session.Cells.Count > 0 && session.Cells.Count % 3 == 0)
-                {
-                    double chancePercentage = 10 / 100;
-                    double randomNumber = new Random().NextDouble();
-
-                    if (randomNumber <= chancePercentage)
-                    {
-                        fieldCell = ReverseFieldCellOwner(session, fieldCell);
-                    }
-                }
-
                 fieldCell = await FieldCellService.Add(fieldCell);
-
-                if (session.IsWinCondition(fieldCell))
-                {
-                    session.WinnerId = fieldCell.OccupiedByUserId;
-                    session.IsEnded = true;
-                }
-
-                if (session.AllFieldIsFull())
-                {
-                    session.IsEnded = true;
-
-                    session = await SessionService.Update(session.Id, session);
-                }
             }
 
             if (fieldCell != null)
@@ -245,12 +230,16 @@ namespace mobibank_test.controller
         /// <param name="moveId">id хода</param>
         /// <param name="fieldCell">Данные клетки поля</param>
         /// <returns></returns>
+        /// <response code="200">Если ход успешно изменён</response>
+        /// <response code="403">Если данный ход не принадлежит данной игре, игра уже окончена или ячейка с указанными x и y уже занята</response>
+        /// <response code="404">Если игра с данным id не найдена или ход с данным moveId не найден</response>
+        /// <response code="400">Если fieldCell=null</response>
         [HttpPut("{id}/moves/{moveId}")]
         public async Task<IResult> UpdateSessionMove(long id, long moveId, [FromBody] FieldCellInputDto fieldCellInputDto)
         {
             FieldCell fieldCell = FieldCellInputDto.MapToEntity(fieldCellInputDto);
-
             Session session = await SessionService.FindById(id);
+
             if (session == null)
                 return Results.NotFound(StandardProblem.SessionNotFound(id, moveId));
             else if (await FieldCellService.FindById(moveId) == null)
@@ -269,13 +258,6 @@ namespace mobibank_test.controller
 
             fieldCell = await FieldCellService.Update(moveId, FieldCellInputDto.MapToEntity(fieldCellInputDto));
 
-            if (session.AllFieldIsFull())
-            {
-                session.IsEnded = true;
-
-                session = await SessionService.Update(session.Id, session);
-            }
-
             if (fieldCell != null)
                 return Results.Json(fieldCell);
             else
@@ -288,6 +270,10 @@ namespace mobibank_test.controller
         /// <param name="id">id игры</param>
         /// <param name="moveId">id хода</param>
         /// <returns></returns>
+        /// <response code="200">Если ход успешно удалён</response>
+        /// <response code="403">Если данный ход не принадлежит данной игре</response>
+        /// <response code="404">Если игра с данным id не найдена или ход с данным moveId не найден</response>
+        /// <response code="400">Если fieldCell=null</response>
         [HttpDelete("{id}/moves/{moveId}")]
         public async Task<IResult> DeleteMoveByMoveId(long id, long moveId)
         {
@@ -302,16 +288,6 @@ namespace mobibank_test.controller
                 return Results.Ok($"Ход с id={moveId} удалён");
             else
                 return Results.NotFound(StandardProblem.FieldNotFound(id, moveId));
-        }
-
-        private FieldCell ReverseFieldCellOwner(Session session, FieldCell cell)
-        {
-            if (session.GetCurrentTurnPlayerId() == session.PlayerXId)
-                cell.OccupiedByUserId = session.PlayerOId;
-            else
-                cell.OccupiedByUserId = session.PlayerXId;
-
-            return cell;
         }
     }
 }

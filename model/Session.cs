@@ -109,6 +109,7 @@ namespace mobibank_test.model
             else
                 return PlayerOId;
         }
+
         public bool IsWinCondition(FieldCell cell)
         {
             int winCondition = int.Parse(Environment.GetEnvironmentVariable("WIN_CONDITION"));

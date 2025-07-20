@@ -186,7 +186,7 @@ namespace mobibank_test.mobi_test_test_project.test
 
             move = null;
             mockFieldCellService.Setup(x => x.Add(FieldCellInputDto.MapToEntity(move)).Result).Returns(FieldCellInputDto.MapToEntity(move));
-            
+
             Assert.Equal(((BadRequest<StandardProblem>)Results.BadRequest(StandardProblem.FieldBadRequest(1L, 0L))).StatusCode,
                          ((BadRequest<StandardProblem>)await controller.AddNewSessionMove(1L, move)).StatusCode);
             Assert.Equal(((BadRequest<StandardProblem>)Results.BadRequest(StandardProblem.FieldBadRequest(1L, 0L))).Value,
@@ -225,9 +225,18 @@ namespace mobibank_test.mobi_test_test_project.test
             var fifthFieldCell = new FieldCell(5L, FieldCellInputDto.MapToEntity(fifthMove));
             mockFieldCellService.Setup(x => x.Add(FieldCellInputDto.MapToEntity(fifthMove)).Result).Returns(fifthFieldCell);
 
-            fifthFieldCell.Session = session;
+            var updatedSession = new Session(session);
+            updatedSession.WinnerId = fifthFieldCell.OccupiedByUserId;
+            updatedSession.IsEnded = true;
+            updatedSession.Cells.Add(FieldCellInputDto.MapToEntity(move));
+            updatedSession.Cells.Add(FieldCellInputDto.MapToEntity(secondMove));
+            updatedSession.Cells.Add(FieldCellInputDto.MapToEntity(thirdMove));
+            updatedSession.Cells.Add(FieldCellInputDto.MapToEntity(fourthMove));
+            mockSessionService.Setup(x => x.Update(session.Id, updatedSession).Result).Returns(updatedSession);
 
-            Assert.True(((JsonHttpResult<FieldCell>)await controller.AddNewSessionMove(1L, fifthMove)).Value.Session.IsEnded);
+            fifthFieldCell.Session = updatedSession;
+
+            Assert.True(((JsonHttpResult<FieldCell>)await controller.AddNewSessionMove(session.Id, fifthMove)).Value.Session.IsEnded);
         }
 
         [Fact]
