@@ -19,7 +19,7 @@ namespace mobibank_test.model
         [JsonIgnore]
         public virtual ICollection<Session> SessionsX { get; set; }
         [JsonIgnore]
-        public virtual ICollection<Session> SessionsY { get; set; }
+        public virtual ICollection<Session> SessionsO { get; set; }
         [JsonIgnore]
         public virtual ICollection<Session> SessionsWinners { get; set; }
 

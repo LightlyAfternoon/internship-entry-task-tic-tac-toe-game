@@ -5,14 +5,14 @@ namespace mobibank_test.controller.dto
     public class SessionInputDto
     {
         public long PlayerXId { get; set; }
-        public long PlayerYId { get; set; }
+        public long PlayerOId { get; set; }
         public long? WinnerId { get; set; }
         public bool IsEnded { get; set; }
 
         public SessionInputDto(Session session)
         {
             PlayerXId = session.PlayerXId;
-            PlayerYId = session.PlayerYId;
+            PlayerOId = session.PlayerOId;
             WinnerId = session.WinnerId;
             IsEnded = session.IsEnded;
         }
@@ -22,7 +22,7 @@ namespace mobibank_test.controller.dto
             if (sessionInputDto != null)
             {
                 int fieldSize = int.Parse(Environment.GetEnvironmentVariable("FIELD_SIZE"));
-                Session session = new Session(fieldSize, sessionInputDto.PlayerXId, sessionInputDto.PlayerYId);
+                Session session = new Session(fieldSize, sessionInputDto.PlayerXId, sessionInputDto.PlayerOId);
                 session.WinnerId = sessionInputDto.WinnerId;
                 session.IsEnded = sessionInputDto.IsEnded;
 

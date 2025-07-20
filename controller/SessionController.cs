@@ -58,7 +58,7 @@ namespace mobibank_test.controller
         ///     POST /games
         ///     {
         ///        "player_x_id": "2",
-        ///        "player_y_id": "3",
+        ///        "player_o_id": "3",
         ///        "winner_id": 1,
         ///        "is_ended": "true"
         ///     }
@@ -92,7 +92,7 @@ namespace mobibank_test.controller
         ///     PUT /games
         ///     {
         ///        "player_x_id": "2",
-        ///        "player_y_id": "3",
+        ///        "player_o_id": "3",
         ///        "winner_id": 1,
         ///        "is_ended": "true"
         ///     }
@@ -307,7 +307,7 @@ namespace mobibank_test.controller
         private FieldCell ReverseFieldCellOwner(Session session, FieldCell cell)
         {
             if (session.GetCurrentTurnPlayerId() == session.PlayerXId)
-                cell.OccupiedByUserId = session.PlayerYId;
+                cell.OccupiedByUserId = session.PlayerOId;
             else
                 cell.OccupiedByUserId = session.PlayerXId;
 

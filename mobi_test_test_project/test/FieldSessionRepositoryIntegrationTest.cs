@@ -39,7 +39,7 @@ namespace mobibank_test.mobi_test_test_project.test
             User user1 = await UserRepository.Save(new User("user 1"));
             User user2 = await UserRepository.Save(new User("user 2"));
             session1.PlayerXId = user1.Id;
-            session1.PlayerYId = user2.Id;
+            session1.PlayerOId = user2.Id;
             session1.WinnerId = user2.Id;
             session1.IsEnded = true;
             session1 = await SessionRepository.Save(session1);
@@ -77,7 +77,7 @@ namespace mobibank_test.mobi_test_test_project.test
             User user1 = await UserRepository.Save(new User("user 1"));
             User user2 = await UserRepository.Save(new User("user 2"));
             session1.PlayerXId = user1.Id;
-            session1.PlayerYId = user2.Id;
+            session1.PlayerOId = user2.Id;
             session1.WinnerId = user2.Id;
             session1.IsEnded = true;
             session1 = await SessionRepository.Save(session1);
@@ -120,7 +120,7 @@ namespace mobibank_test.mobi_test_test_project.test
             User user1 = await UserRepository.Save(new User("user 1"));
             User user2 = await UserRepository.Save(new User("user 2"));
             session1.PlayerXId = user1.Id;
-            session1.PlayerYId = user2.Id;
+            session1.PlayerOId = user2.Id;
             session1.WinnerId = user2.Id;
             session1.IsEnded = true;
             session1 = await SessionRepository.Save(session1);
@@ -175,7 +175,7 @@ namespace mobibank_test.mobi_test_test_project.test
             User user1 = await UserRepository.Save(new User("user 1"));
             User user2 = await UserRepository.Save(new User("user 2"));
             session1.PlayerXId = user1.Id;
-            session1.PlayerYId = user2.Id;
+            session1.PlayerOId = user2.Id;
             session1.WinnerId = user2.Id;
             session1.IsEnded = true;
             session1 = await SessionRepository.Save(session1);

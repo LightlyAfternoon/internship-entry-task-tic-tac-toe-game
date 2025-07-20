@@ -37,7 +37,7 @@ namespace mobibank_test.mobi_test_test_project.test
             User user1 = await UserRepository.Save(new User("user 1"));
             User user2 = await UserRepository.Save(new User("user 2"));
             session1.PlayerXId = user1.Id;
-            session1.PlayerYId = user2.Id;
+            session1.PlayerOId = user2.Id;
             session1.WinnerId = user2.Id;
             session1.IsEnded = true;
 
@@ -47,7 +47,7 @@ namespace mobibank_test.mobi_test_test_project.test
 
             Session session2 = new Session();
             session2.PlayerXId = user2.Id;
-            session2.PlayerYId = user1.Id;
+            session2.PlayerOId = user1.Id;
 
             session2 = await SessionRepository.Save(session2);
 
@@ -66,7 +66,7 @@ namespace mobibank_test.mobi_test_test_project.test
             User user1 = await UserRepository.Save(new User("user 1"));
             User user2 = await UserRepository.Save(new User("user 2"));
             session1.PlayerXId = user1.Id;
-            session1.PlayerYId = user2.Id;
+            session1.PlayerOId = user2.Id;
             session1.WinnerId = user2.Id;
             session1.IsEnded = true;
 
@@ -76,7 +76,7 @@ namespace mobibank_test.mobi_test_test_project.test
 
             Session session2 = new Session();
             session2.PlayerXId = user2.Id;
-            session2.PlayerYId = user1.Id;
+            session2.PlayerOId = user1.Id;
 
             session2 = await SessionRepository.Save(session2);
             
@@ -100,25 +100,25 @@ namespace mobibank_test.mobi_test_test_project.test
             User user1 = await UserRepository.Save(new User("user 1"));
             User user2 = await UserRepository.Save(new User("user 2"));
             session1.PlayerXId = user1.Id;
-            session1.PlayerYId = user2.Id;
+            session1.PlayerOId = user2.Id;
             session1.WinnerId = user2.Id;
             session1.IsEnded = true;
 
             session1 = await SessionRepository.Save(session1);
 
             Assert.Equal(user1.Id, session1.PlayerXId);
-            Assert.Equal(user2.Id, session1.PlayerYId);
+            Assert.Equal(user2.Id, session1.PlayerOId);
             Assert.Equal(user2.Id, session1.WinnerId);
             Assert.True(session1.IsEnded);
 
             Session session2 = new Session();
             session2.PlayerXId = user2.Id;
-            session2.PlayerYId = user1.Id;
+            session2.PlayerOId = user1.Id;
 
             session2 = await SessionRepository.Save(session2);
 
             Assert.Equal(user2.Id, session2.PlayerXId);
-            Assert.Equal(user1.Id, session2.PlayerYId);
+            Assert.Equal(user1.Id, session2.PlayerOId);
             Assert.Null(session2.WinnerId);
             Assert.False(session2.IsEnded);
 
@@ -129,7 +129,7 @@ namespace mobibank_test.mobi_test_test_project.test
 
             Assert.Equal(session1.Id, editedSession1.Id);
             Assert.Equal(user1.Id, editedSession1.PlayerXId);
-            Assert.Equal(user2.Id, editedSession1.PlayerYId);
+            Assert.Equal(user2.Id, editedSession1.PlayerOId);
             Assert.Equal(user1.Id, editedSession1.WinnerId);
             Assert.True(editedSession1.IsEnded);
         }
@@ -146,7 +146,7 @@ namespace mobibank_test.mobi_test_test_project.test
             User user1 = await UserRepository.Save(new User("user 1"));
             User user2 = await UserRepository.Save(new User("user 2"));
             session1.PlayerXId = user1.Id;
-            session1.PlayerYId = user2.Id;
+            session1.PlayerOId = user2.Id;
             session1.WinnerId = user2.Id;
             session1.IsEnded = true;
 

@@ -28,7 +28,7 @@ namespace mobibank_test.mobi_test_test_project.test
             Assert.Equal(((JsonHttpResult<Session>)Results.Json(session)).Value,
                          ((JsonHttpResult<Session>)await controller.GetSessionById(1)).Value);
 
-            session.PlayerYId = 3L;
+            session.PlayerOId = 3L;
 
             Assert.NotEqual(((JsonHttpResult<Session>)Results.Json(session)).Value,
                          ((JsonHttpResult<Session>)await controller.GetSessionById(1)).Value);
@@ -49,12 +49,12 @@ namespace mobibank_test.mobi_test_test_project.test
             Assert.Equal(((JsonHttpResult<List<Session>>)Results.Json(sessions)).Value,
                 ((JsonHttpResult<List<Session>>)await controller.GetAllSessions()).Value);
 
-            session1.PlayerYId = 3L;
+            session1.PlayerOId = 3L;
 
             Assert.NotEqual(((JsonHttpResult<List<Session>>)Results.Json(sessions)).Value,
                 ((JsonHttpResult<List<Session>>)await controller.GetAllSessions()).Value);
 
-            session1.PlayerYId = 2L;
+            session1.PlayerOId = 2L;
 
             Assert.Equal(((JsonHttpResult<List<Session>>)Results.Json(sessions)).Value,
                 ((JsonHttpResult<List<Session>>)await controller.GetAllSessions()).Value);
@@ -96,7 +96,7 @@ namespace mobibank_test.mobi_test_test_project.test
             var controller = new SessionController(mockSessionService.Object, mockFieldCellService.Object);
 
             mockSessionService.Setup(x => x.FindById(2L).Result).Returns(new Session(2L, SessionInputDto.MapToEntity(session)));
-            session.PlayerYId = 3L;
+            session.PlayerOId = 3L;
             mockSessionService.Setup(x => x.Update(2L, SessionInputDto.MapToEntity(session)).Result).Returns(new Session(2L, SessionInputDto.MapToEntity(session)));
 
             Assert.Equal(((JsonHttpResult<Session>)Results.Json(new Session(2L, SessionInputDto.MapToEntity(session)))).Value,

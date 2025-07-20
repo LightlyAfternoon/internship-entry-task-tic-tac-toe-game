@@ -20,8 +20,8 @@ namespace mobibank_test.model
         [Column("player_x_id"), ForeignKey("PlayerX")]
         public long PlayerXId { get; set; }
         [Required]
-        [Column("player_y_id"), ForeignKey("PlayerY")]
-        public long PlayerYId { get; set; }
+        [Column("player_o_id"), ForeignKey("PlayerY")]
+        public long PlayerOId { get; set; }
         [Column("winner_id"), ForeignKey("Winner")]
         public long? WinnerId { get; set; }
         [Required]
@@ -32,8 +32,8 @@ namespace mobibank_test.model
         [InverseProperty("SessionsX")]
         public virtual User PlayerX { get; set; }
         [JsonIgnore]
-        [InverseProperty("SessionsY")]
-        public virtual User PlayerY { get; set; }
+        [InverseProperty("SessionsO")]
+        public virtual User PlayerO { get; set; }
         [JsonIgnore]
         [InverseProperty("SessionsWinners")]
         public virtual User? Winner { get; set; }
@@ -46,37 +46,37 @@ namespace mobibank_test.model
             Cells = new List<FieldCell>();
         }
 
-        public Session(long id, long playerXId, long playerYId)
+        public Session(long id, long playerXId, long playerOId)
         {
             Id = id;
             FieldSize = 3;
             PlayerXId = playerXId;
-            PlayerYId = playerYId;
+            PlayerOId = playerOId;
             Cells = new List<FieldCell>();
         }
 
-        public Session(long playerXId, long playerYId)
+        public Session(long playerXId, long playerOId)
         {
             FieldSize = 3;
             PlayerXId = playerXId;
-            PlayerYId = playerYId;
+            PlayerOId = playerOId;
             Cells = new List<FieldCell>();
         }
 
-        public Session(long id, int fieldSize, long playerXId, long playerYId)
+        public Session(long id, int fieldSize, long playerXId, long playerOId)
         {
             Id = id;
             FieldSize = fieldSize;
             PlayerXId = playerXId;
-            PlayerYId = playerYId;
+            PlayerOId = playerOId;
             Cells = new List<FieldCell>();
         }
 
-        public Session(int fieldSize, long playerXId, long playerYId)
+        public Session(int fieldSize, long playerXId, long playerOId)
         {
             FieldSize = fieldSize;
             PlayerXId = playerXId;
-            PlayerYId = playerYId;
+            PlayerOId = playerOId;
             Cells = new List<FieldCell>();
         }
 
@@ -85,7 +85,7 @@ namespace mobibank_test.model
             Id = id;
             FieldSize = session.FieldSize;
             PlayerXId = session.PlayerXId;
-            PlayerYId = session.PlayerYId;
+            PlayerOId = session.PlayerOId;
             WinnerId = session.WinnerId;
             IsEnded = session.IsEnded;
             Cells = new List<FieldCell>();
@@ -96,7 +96,7 @@ namespace mobibank_test.model
             Id = session.Id;
             FieldSize = session.FieldSize;
             PlayerXId = session.PlayerXId;
-            PlayerYId = session.PlayerYId;
+            PlayerOId = session.PlayerOId;
             WinnerId = session.WinnerId;
             IsEnded = session.IsEnded;
             Cells = new List<FieldCell>();
@@ -107,7 +107,7 @@ namespace mobibank_test.model
             if (Cells.Count % 2 == 0)
                 return PlayerXId;
             else
-                return PlayerYId;
+                return PlayerOId;
         }
         public bool IsWinCondition(FieldCell cell)
         {
@@ -355,14 +355,14 @@ namespace mobibank_test.model
                 return false;
             else
                 return Id.Equals(session.Id) && FieldSize.Equals(session.FieldSize)
-                && PlayerXId.Equals(session.PlayerXId) && PlayerYId.Equals(session.PlayerYId)
+                && PlayerXId.Equals(session.PlayerXId) && PlayerOId.Equals(session.PlayerOId)
                 && WinnerId.Equals(session.WinnerId) && IsEnded.Equals(session.IsEnded);
         }
 
         public override int GetHashCode()
         {
             return Id.GetHashCode() + FieldSize.GetHashCode() + PlayerXId.GetHashCode()
-            + PlayerYId.GetHashCode() + WinnerId.GetHashCode() + IsEnded.GetHashCode();
+            + PlayerOId.GetHashCode() + WinnerId.GetHashCode() + IsEnded.GetHashCode();
         }
     }
 }
